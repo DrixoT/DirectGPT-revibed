@@ -21,3 +21,8 @@ Inventory of what the paper (Masson et al., CHI '24, "DirectGPT") specifies, tak
 | Change highlighting after generation (fig. 2b, bold words) | Client-side word LCS diff → bold; SVG changed ids → fading outline | — | exact | feedback tests |
 | Cursor indicating the active tool (§3.1, appearance not shown) | Label pinned to the cursor with the tool template and its filled slots, plus a `copy` cursor over the panel | Paper shows no cursor design (DECISIONS.md §7b) | equivalent | tool tests |
 | Loading feedback when a prompt targets no object (§3.2.4 covers targeted pulses only) | Pulsing panel border + streaming status | Not specified for global prompts (DECISIONS.md §7d) | equivalent | feedback tests |
+| Study task panel: short non-selectable instruction + content/target image, always visible (§4.2) | Left panel with instruction, yellow-highlighted starting content or target SVG, `user-select: none`, drag suppressed | — | exact | TEST-S01 |
+| Content pre-loaded per task and reset between tasks (§4.2) | `startTask` reloads the content and resets the undo history | — | exact | TEST-S02 |
+| Three-minute task limit (§4.2) | 180 s countdown in the task panel, auto-finishes the task | — | exact | TEST-S02 |
+| 5-point "How close are you to the target" rating after each task (§4.2) | Modal with distant→close 1-5 scale, results shown in an end-of-activity summary | Kept in memory; the paper logged to a server | equivalent | TEST-S02 |
+| Study targets for the image activity (fig. 5) | Hand-built target SVGs for the four flower and four smiley tasks | Redrawn from the figure | equivalent | TEST-S01 |

@@ -1,6 +1,7 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import type React from 'react';
 import { createChipElement, refFromChip } from '../chip';
+import { refLabel } from '../types';
 import type { ObjectRef, PromptPart } from '../types';
 
 export interface PromptFieldHandle {
@@ -23,10 +24,13 @@ interface Props {
   onHoverRef: (ref: ObjectRef | null) => void;
 }
 
-type DropSpec = { kind: 'word'; node: Text; start: number; end: number } | { kind: 'caret'; node: Node; offset: number };
+type DropSpec =
+  | { kind: 'word'; node: Text; start: number; end: number }
+  | { kind: 'chip'; node: HTMLElement }
+  | { kind: 'caret'; node: Node; offset: number };
 
 interface Indicator {
-  kind: 'word' | 'caret';
+  kind: 'word' | 'chip' | 'caret';
   left: number;
   top: number;
   width: number;
@@ -217,12 +221,15 @@ const PromptField = forwardRef<PromptFieldHandle, Props>(function PromptField(
         }
         let pos = caretFromPoint(x, y);
         if (!pos || !ed.contains(pos.node)) pos = { node: ed, offset: ed.childNodes.length };
-        const chip = (pos.node instanceof Element ? pos.node : pos.node.parentElement)?.closest('.chip');
-        if (chip && ed.contains(chip) && chip.parentNode) {
-          pos = { node: chip.parentNode, offset: Array.from(chip.parentNode.childNodes).indexOf(chip as ChildNode) + 1 };
-        }
-        let next: DropSpec = { kind: 'caret', node: pos.node, offset: pos.offset };
-        if (pos.node.nodeType === Node.TEXT_NODE) {
+        // Dropping onto an existing object-word replaces it, like dropping onto a typed word.
+        const hovered = document.elementFromPoint(x, y);
+        const chip =
+          (hovered instanceof Element ? hovered.closest('.chip') : null) ??
+          (pos.node instanceof Element ? pos.node : pos.node.parentElement)?.closest('.chip') ??
+          null;
+        let next: DropSpec | null = chip instanceof HTMLElement && ed.contains(chip) ? { kind: 'chip', node: chip } : null;
+        if (next === null) next = { kind: 'caret', node: pos.node, offset: pos.offset };
+        if (next.kind === 'caret' && pos.node.nodeType === Node.TEXT_NODE) {
           const t = pos.node.textContent ?? '';
           const o = pos.offset;
           const isW = (c: string | undefined) => c !== undefined && /\S/.test(c);
@@ -235,15 +242,19 @@ const PromptField = forwardRef<PromptFieldHandle, Props>(function PromptField(
           }
         }
         spec.current = next;
+        let rect: DOMRect;
         const r = document.createRange();
-        if (next.kind === 'word') {
+        if (next.kind === 'chip') {
+          rect = next.node.getBoundingClientRect();
+        } else if (next.kind === 'word') {
           r.setStart(next.node, next.start);
           r.setEnd(next.node, next.end);
+          rect = (r.getClientRects()[0] ?? r.getBoundingClientRect()) as DOMRect;
         } else {
           r.setStart(next.node, next.offset);
           r.collapse(true);
+          rect = (r.getClientRects()[0] ?? r.getBoundingClientRect()) as DOMRect;
         }
-        let rect = r.getClientRects()[0] ?? r.getBoundingClientRect();
         if (next.kind === 'caret' && rect.width === 0 && rect.height === 0) {
           const prev = next.node.childNodes[next.offset - 1];
           const nxt = next.node.childNodes[next.offset];
@@ -260,7 +271,7 @@ const PromptField = forwardRef<PromptFieldHandle, Props>(function PromptField(
           kind: next.kind,
           left: rect.left - wrect.left,
           top: rect.top - wrect.top,
-          width: next.kind === 'word' ? rect.width : 2,
+          width: next.kind === 'caret' ? 2 : rect.width,
           height: rect.height || 20,
         });
         return true;
@@ -270,7 +281,11 @@ const PromptField = forwardRef<PromptFieldHandle, Props>(function PromptField(
         const ed = editor.current;
         if (!s || !ed) return;
         const range = document.createRange();
-        if (s.kind === 'word') {
+        if (s.kind === 'chip') {
+          range.setStartBefore(s.node);
+          range.setEndAfter(s.node);
+          range.deleteContents();
+        } else if (s.kind === 'word') {
           range.setStart(s.node, s.start);
           range.setEnd(s.node, s.end);
           range.deleteContents();
@@ -341,6 +356,29 @@ const PromptField = forwardRef<PromptFieldHandle, Props>(function PromptField(
     [submit, syncEmpty],
   );
 
+  /** Object-words are copied as markup so they can be pasted back as references, "like single words". */
+  const onCopy = useCallback(
+    (e: React.ClipboardEvent<HTMLDivElement>, cut: boolean) => {
+      const sel = window.getSelection();
+      const ed = editor.current;
+      if (!ed || !sel || sel.rangeCount === 0 || sel.isCollapsed) return;
+      const range = sel.getRangeAt(0);
+      if (!ed.contains(range.commonAncestorContainer)) return;
+      const frag = range.cloneContents();
+      const holder = document.createElement('div');
+      holder.append(frag);
+      if (!holder.querySelector('.chip')) return; // plain text: let the browser handle it
+      e.preventDefault();
+      e.clipboardData.setData('text/html', holder.innerHTML);
+      e.clipboardData.setData('text/plain', readParts(holder).map((p) => (p.type === 'text' ? p.text : refLabel(p.ref))).join(''));
+      if (cut) {
+        range.deleteContents();
+        syncEmpty();
+      }
+    },
+    [syncEmpty],
+  );
+
   const onPaste = useCallback(
     (e: React.ClipboardEvent<HTMLDivElement>) => {
       e.preventDefault();
@@ -384,6 +422,8 @@ const PromptField = forwardRef<PromptFieldHandle, Props>(function PromptField(
           onInput={syncEmpty}
           onFocus={ensureCaret}
           onKeyDown={onKeyDown}
+          onCopy={(e) => onCopy(e, false)}
+          onCut={(e) => onCopy(e, true)}
           onPaste={onPaste}
           onMouseOver={onMouseOver}
           onMouseLeave={() => onHoverRef(null)}

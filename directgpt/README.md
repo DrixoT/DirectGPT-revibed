@@ -31,14 +31,14 @@ With nothing selected, a prompt applies to the whole content: *use the future te
 
 ### 3. Localize a prompt: select, then type
 
-- **Text and code**: select a span with the mouse (double-click selects a word). Hold **Ctrl/Cmd** while selecting to add more spans.
+- **Text and code**: click a word (or code token) to select it; drag across text to select a longer passage. Hold **Ctrl/Cmd** while clicking or dragging to add spans to the selection, and Ctrl/Cmd-click a selected word again to remove it.
 - **SVG**: click an element to select it; Ctrl/Cmd-click to add more; click an empty spot to select a pixel location.
 
 The prompt field shows **Apply to N selected elements**. Now type only the verb — *synonym*, *add description of its tail*, *use red/blue gradient*, *rename to size* — and press Enter. Only the selected objects are rewritten; they pulse while the model works. Click the ✕ on the indicator or press Esc to deselect.
 
 ### 4. Refer to objects: drag them into the prompt
 
-Drag a selected span of text, an SVG element, or an empty spot of the image and drop it **onto a word** of the prompt (the word turns yellow and is replaced) or **between words** (a blue caret shows the insertion point). The object becomes an *object-word*: a grey chip showing the word, a thumbnail of the shape, or `(x, y)` for a location. Chips can be deleted with Backspace/Delete and copied/pasted like words. Hovering a chip highlights the object in the output.
+Drag a word or code token straight out of the content panel (a whole passage is dragged by selecting it first, then pressing inside the selection), or drag an SVG element or an empty spot of the image, and drop it **onto a word** of the prompt (the word turns yellow and is replaced) or **between words** (a blue caret shows the insertion point). The object becomes an *object-word*: a grey chip showing the word, a thumbnail of the shape, or `(x, y)` for a location. Chips can be deleted with Backspace/Delete and copied, cut and pasted like words; dropping another object onto a chip replaces it. Hovering a chip highlights the object in the output.
 
 Examples: type *add a line from here to there*, then drop two locations on *here* and *there*; type *replace this and that with synonyms* and drop two words; select a location, type *add a circle like this* and drop a petal on *this*.
 
@@ -65,9 +65,13 @@ While a prompt runs, selected and referred objects pulse (for a prompt targeting
 
 The header switch **ChatGPT replica** shows the conversational baseline used in the paper's study: streamed answers, Markdown rendering with code highlighting, SVGs rendered inline, and the same content samples loadable as the first message of the conversation. It uses the same API key and model.
 
-## Study tasks
+## Study mode
 
-After loading a study sample, the tasks used in the paper's user study for that content are listed under the panel (e.g. *replace 5 words by synonyms*, *convert two for loops into while loops*, *add a stem and two leaves*).
+**Study session** in the header runs one activity from the paper's user study (Text A/B, Code A/B, Image A/B), each with its four tasks. A task panel on the left shows, at all times: the activity, the task number, a three-minute countdown, a short instruction (*Text in yellow => synonyms*, *Reproduce (add elements)*), and the target — the starting content with the parts to edit in yellow, or the target image. The panel is inert: its text cannot be selected or dragged into the prompt.
+
+The task's starting content is loaded automatically and reset for every task. Press **Task done**, or let the three minutes run out, and a 5-point *How close are you to the target?* (distant → close) rating is asked before the next task; a summary of times and ratings closes the activity. Study mode works with both the DirectGPT and the ChatGPT-replica interface, as in the paper.
+
+Outside a study session, **Load study sample** loads any of the six contents on its own, and the four study tasks for it are listed under the panel.
 
 ## Notes
 

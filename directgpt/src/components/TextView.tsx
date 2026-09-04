@@ -20,6 +20,29 @@ interface Mark extends Range {
   cls: string;
 }
 
+const WORD_CHAR = /[\p{L}\p{N}_$]/u;
+
+/** The word (or code token) containing an offset, used for click selection. */
+export function wordAt(value: string, off: number): TextRef | null {
+  const isWord = (c: string | undefined) => c !== undefined && WORD_CHAR.test(c);
+  let start: number;
+  let end: number;
+  if (isWord(value[off])) {
+    start = off;
+    end = off;
+    while (isWord(value[end])) end++;
+    while (start > 0 && isWord(value[start - 1])) start--;
+  } else if (isWord(value[off - 1])) {
+    start = off;
+    end = off;
+    while (start > 0 && isWord(value[start - 1])) start--;
+  } else {
+    return null;
+  }
+  if (end <= start) return null;
+  return { type: 'text', start, end, text: value.slice(start, end) };
+}
+
 /** Text offset (in the rendered content) of a DOM position. Works because the DOM text equals the content exactly. */
 function offsetOf(container: HTMLElement, node: Node, offset: number): number | null {
   if (!container.contains(node)) return null;
@@ -47,6 +70,7 @@ function offsetFromPoint(container: HTMLElement, x: number, y: number): number |
 
 export default function TextView({ value, language, selection, pulse, changed, hover, slotRefs, onSelectionComplete, onDragStart }: Props) {
   const ref = useRef<HTMLDivElement>(null);
+  const draggingOut = useRef(false);
 
   const pieces = useMemo(() => {
     const marks: Mark[] = [];
@@ -93,28 +117,64 @@ export default function TextView({ value, language, selection, pulse, changed, h
       if (e.button !== 0 || !ref.current) return;
       const off = offsetFromPoint(ref.current, e.clientX, e.clientY);
       if (off === null) return;
-      const hit = selection.find((s) => off > s.start && off < s.end);
-      if (!hit) return;
-      // Pointer down inside a selected span: drag it (and the other selected spans) instead of selecting anew.
-      e.preventDefault();
       const additive = additiveKey(e);
-      beginPotentialDrag(e, {
-        onStart: (ev) => onDragStart(selection, ev),
-        onClick: () => {
-          if (additive) onSelectionComplete([hit], true); // toggles it off
-        },
-      });
+      const hit = selection.find((s) => off >= s.start && off <= s.end);
+
+      if (hit) {
+        // Pointer down inside a selected span: drag it (and the other selected spans) instead of selecting anew.
+        e.preventDefault();
+        beginPotentialDrag(e, {
+          onStart: (ev) => onDragStart(selection, ev),
+          onClick: () => onSelectionComplete([hit], additive),
+        });
+        return;
+      }
+
+      // Not on a selection: let the native drag-selection run, but if the pointer leaves the
+      // content panel (i.e. heads for the prompt field) turn the gesture into an object drag
+      // of the word under the cursor, so a word can be dragged out without selecting it first.
+      const word = wordAt(value, off);
+      if (!word) return;
+      const panel = ref.current.closest('.object-panel') ?? ref.current;
+      const bounds = panel.getBoundingClientRect();
+      const cleanup = () => {
+        window.removeEventListener('pointermove', move);
+        window.removeEventListener('pointerup', up);
+        window.removeEventListener('pointercancel', up);
+      };
+      const move = (ev: PointerEvent) => {
+        const outside = ev.clientX < bounds.left || ev.clientX > bounds.right || ev.clientY < bounds.top || ev.clientY > bounds.bottom;
+        if (!outside) return;
+        cleanup();
+        draggingOut.current = true;
+        // Drag the word that was pressed; the browser's incidental drag-selection is discarded.
+        // (A whole passage is dragged by selecting it first, then pressing inside the selection.)
+        window.getSelection()?.removeAllRanges();
+        onDragStart([word], ev);
+      };
+      const up = () => cleanup();
+      window.addEventListener('pointermove', move);
+      window.addEventListener('pointerup', up);
+      window.addEventListener('pointercancel', up);
     },
-    [selection, onDragStart, onSelectionComplete],
+    [selection, value, onDragStart, onSelectionComplete],
   );
 
   const onMouseUp = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (e.button !== 0 || !ref.current) return;
+      if (draggingOut.current) {
+        draggingOut.current = false;
+        return;
+      }
       const sel = window.getSelection();
       const additive = additiveKey(e);
       if (!sel || sel.rangeCount === 0 || sel.isCollapsed) {
-        if (!additive) onSelectionComplete([], false);
+        // A plain click selects the word (or code token) under the cursor (§3.2.2: "objects are selected with a click").
+        const off = offsetFromPoint(ref.current, e.clientX, e.clientY);
+        const word = off === null ? null : wordAt(value, off);
+        if (word) onSelectionComplete([word], additive);
+        else if (!additive) onSelectionComplete([], false);
         return;
       }
       const range = sel.getRangeAt(0);

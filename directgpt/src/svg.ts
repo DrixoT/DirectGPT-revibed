@@ -65,6 +65,13 @@ export function normalizeSvg(svg: string): string {
   return new XMLSerializer().serializeToString(root);
 }
 
+/** True when the markup parses as an SVG with at least one drawable element. */
+export function isRenderableSvg(svg: string): boolean {
+  const root = parseSvg(svg);
+  if (!root) return false;
+  return root.querySelector('*:not(defs):not(defs *):not(style):not(title):not(desc):not(metadata)') !== null;
+}
+
 export function isSelectableSvgElement(el: Element | null): el is SVGGraphicsElement {
   if (!el || !(el instanceof SVGElement)) return false;
   if (NON_SELECTABLE.has(el.tagName.toLowerCase())) return false;

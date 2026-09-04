@@ -5,6 +5,8 @@ import EmptyState from './components/EmptyState';
 import PromptField from './components/PromptField';
 import type { PromptFieldHandle } from './components/PromptField';
 import SettingsDialog from './components/Settings';
+import StudyPanel, { RatingDialog, StudySummary } from './components/StudyPanel';
+import type { StudyResult } from './components/StudyPanel';
 import SvgView from './components/SvgView';
 import TextView from './components/TextView';
 import Toolbar from './components/Toolbar';
@@ -15,7 +17,9 @@ import { buildPrompts, plainPromptText } from './prompts';
 import { SAMPLES } from './samples';
 import type { Sample } from './samples';
 import { loadSettings, saveSettings } from './settings';
-import { changedSvgIds, normalizeSvg } from './svg';
+import { STUDY_ACTIVITIES } from './study';
+import type { StudyActivity } from './study';
+import { changedSvgIds, isRenderableSvg, normalizeSvg } from './svg';
 import { refLabel, sameRef } from './types';
 import type { ActiveTool, Content, ElementRef, LocationRef, ObjectRef, PromptPart, Range, Settings, TemplatePart, TextRef, Tool } from './types';
 import { useHistory } from './useHistory';
@@ -86,6 +90,11 @@ export default function App() {
   const [samplesOpen, setSamplesOpen] = useState(false);
   const [activeSample, setActiveSample] = useState<Sample | null>(null);
   const [chatSeed, setChatSeed] = useState<{ content: Content; nonce: number } | null>(null);
+  const [study, setStudy] = useState<{ activity: StudyActivity; index: number; startedAt: number } | null>(null);
+  const [rating, setRating] = useState<{ timedOut: boolean; seconds: number } | null>(null);
+  const [studyResults, setStudyResults] = useState<StudyResult[]>([]);
+  const [studySummary, setStudySummary] = useState<StudyResult[] | null>(null);
+  const [studyMenuOpen, setStudyMenuOpen] = useState(false);
   const promptRef = useRef<PromptFieldHandle>(null);
 
   const tool = activeTool ? tools.find((t) => t.id === activeTool.id) ?? null : null;
@@ -121,6 +130,62 @@ export default function App() {
     clearMarks();
     setActiveSample(null);
     promptRef.current?.clear();
+  };
+
+  /** Loads a task's starting content ("already added ... as the first message", §4.2) and resets the history. */
+  const startTask = useCallback(
+    (activity: StudyActivity, index: number) => {
+      pendingRef.current?.abort.abort();
+      const content = normalizeContent(activity.content);
+      history.reset(content);
+      setChatSeed({ content, nonce: Date.now() });
+      setSelection([]);
+      setActiveTool(null);
+      clearMarks();
+      setActiveSample(null);
+      promptRef.current?.clear();
+      setStudy({ activity, index, startedAt: Date.now() });
+    },
+    // history.reset is stable
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
+
+  const finishTask = useCallback((timedOut: boolean) => {
+    setStudy((s) => {
+      if (!s) return s;
+      setRating((r) => r ?? { timedOut, seconds: Math.round((Date.now() - s.startedAt) / 1000) });
+      return s;
+    });
+  }, []);
+
+  const recordRating = (value: number) => {
+    if (!study || !rating) return;
+    const task = study.activity.tasks[study.index];
+    const result: StudyResult = {
+      activity: study.activity.name,
+      task: study.index + 1,
+      instruction: task.instruction,
+      seconds: rating.seconds,
+      rating: value,
+      timedOut: rating.timedOut,
+    };
+    const results = [...studyResults, result];
+    setStudyResults(results);
+    setRating(null);
+    if (study.index + 1 < study.activity.tasks.length) {
+      startTask(study.activity, study.index + 1);
+    } else {
+      setStudy(null);
+      setStudyResults([]);
+      setStudySummary(results);
+    }
+  };
+
+  const quitStudy = () => {
+    setStudy(null);
+    setRating(null);
+    setStudyResults([]);
   };
 
   const undo = () => {
@@ -248,6 +313,15 @@ export default function App() {
         setChangedText(changed);
       } else {
         next = normalizeContent(extractObject(responses[0], current));
+        // An image edit must not destroy the image when the model answers with prose or broken markup.
+        if (current?.kind === 'svg' && (next.kind !== 'svg' || !isRenderableSvg(next.value))) {
+          setError('The model did not return a valid SVG, so the image was left unchanged.');
+          return;
+        }
+        if (next.kind === 'svg' && !isRenderableSvg(next.value)) {
+          setError('The model returned SVG that could not be rendered.');
+          return;
+        }
         if (next.kind === 'svg') setChangedSvg(changedSvgIds(current?.kind === 'svg' ? current.value : null, next.value));
         else if (current && current.kind !== 'svg') setChangedText(changedRanges(current.value, next.value));
       }
@@ -271,7 +345,10 @@ export default function App() {
   const mergeSelection = (prev: ObjectRef[], refs: ObjectRef[]): ObjectRef[] => {
     let out = [...prev];
     for (const r of refs) {
-      const i = out.findIndex((o) => sameRef(o, r));
+      // Ctrl/Cmd toggles: an exact match, or (for text) any span overlapping the clicked word.
+      const i = out.findIndex(
+        (o) => sameRef(o, r) || (o.type === 'text' && r.type === 'text' && o.start < r.end && r.start < o.end),
+      );
       if (i >= 0) out = out.filter((_, j) => j !== i);
       else out.push(r);
     }
@@ -416,7 +493,41 @@ export default function App() {
             </div>
           )}
         </div>
-        {mode === 'direct' && (
+        <div className="menu">
+          <button type="button" className="menu-trigger" onClick={() => setStudyMenuOpen((o) => !o)}>
+            {study ? 'Study running' : 'Study session'} ▾
+          </button>
+          {studyMenuOpen && (
+            <div className="menu-list" onMouseLeave={() => setStudyMenuOpen(false)}>
+              <div className="group">Start an activity (4 tasks, 3 min each)</div>
+              {STUDY_ACTIVITIES.map((a) => (
+                <button
+                  key={a.id}
+                  type="button"
+                  onClick={() => {
+                    setStudyMenuOpen(false);
+                    setStudyResults([]);
+                    startTask(a, 0);
+                  }}
+                >
+                  {a.name}
+                </button>
+              ))}
+              {study && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStudyMenuOpen(false);
+                    quitStudy();
+                  }}
+                >
+                  Leave the current session
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+        {mode === 'direct' && !study && (
           <button type="button" onClick={newDocument} title="Clear the content and the toolbar">
             New
           </button>
@@ -429,7 +540,16 @@ export default function App() {
       </header>
 
       {mode === 'direct' ? (
-        <div className="direct">
+        <div className={`direct ${study ? 'with-study' : ''}`}>
+          {study && (
+            <StudyPanel
+              activity={study.activity}
+              taskIndex={study.index}
+              startedAt={study.startedAt}
+              onFinishTask={finishTask}
+              onQuit={quitStudy}
+            />
+          )}
           <Toolbar tools={tools} active={activeTool} onClickTool={handleToolClick} onRemoveTool={(id) => setTools((ts) => ts.filter((t) => t.id !== id))} onHoverRef={setHoverRef} />
           <main className="workspace">
             <div className="history-bar">
@@ -477,7 +597,7 @@ export default function App() {
                 />
               )}
             </div>
-            {activeSample && content && (
+            {activeSample && content && !study && (
               <div className="tasks-hint">
                 <b>Study tasks for this sample:</b> {activeSample.tasks.join(' · ')}
               </div>
@@ -495,8 +615,22 @@ export default function App() {
           </main>
         </div>
       ) : (
-        <ChatView settings={settings} onNeedKey={() => setShowSettings(true)} onError={setError} seed={chatSeed} />
+        <div className={`baseline ${study ? 'with-study' : ''}`}>
+          {study && (
+            <StudyPanel
+              activity={study.activity}
+              taskIndex={study.index}
+              startedAt={study.startedAt}
+              onFinishTask={finishTask}
+              onQuit={quitStudy}
+            />
+          )}
+          <ChatView settings={settings} onNeedKey={() => setShowSettings(true)} onError={setError} seed={chatSeed} />
+        </div>
       )}
+
+      {rating && <RatingDialog timedOut={rating.timedOut} onRate={recordRating} />}
+      {studySummary && <StudySummary results={studySummary} onClose={() => setStudySummary(null)} />}
 
       {tool && cursor && !drag && !pending && (
         <div className="tool-cursor" style={{ left: cursor.x, top: cursor.y }}>

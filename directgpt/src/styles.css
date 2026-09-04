@@ -432,8 +432,10 @@ button {
   z-index: 0;
   border-radius: 3px;
 }
-.drop-indicator.word {
+.drop-indicator.word,
+.drop-indicator.chip {
   background: var(--yellow);
+  box-shadow: 0 0 0 2px var(--yellow);
 }
 .drop-indicator.caret {
   background: var(--blue);
@@ -524,7 +526,8 @@ button {
   position: fixed;
   pointer-events: none;
   z-index: 100;
-  transform: translate(-50%, -50%);
+  /* Trails the cursor so it never covers the word the drop would replace. */
+  transform: translate(14px, 12px);
   display: flex;
   gap: 4px;
   opacity: 0.9;
@@ -793,4 +796,136 @@ button.primary:disabled {
   50% {
     opacity: 0.6;
   }
+}
+
+/* Study apparatus (§4): task panel, timer, rating */
+.direct.with-study {
+  grid-template-columns: 260px 200px 1fr;
+}
+.study-panel {
+  border-right: 1px solid var(--grey-border);
+  background: #fbfbfc;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.study-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.study-activity {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--grey-text);
+}
+.study-quit {
+  border: none;
+  background: transparent;
+  color: var(--grey-text);
+  font-size: 12px;
+  padding: 2px 4px;
+}
+.study-progress {
+  font-size: 12px;
+  color: var(--grey-text);
+}
+.study-timer {
+  font-variant-numeric: tabular-nums;
+  font-size: 20px;
+  font-weight: 700;
+}
+.study-timer.low {
+  color: #b91c1c;
+}
+.study-instruction {
+  font-size: 15px;
+  font-weight: 700;
+  background: #fff;
+  border: 1px solid var(--grey-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+.study-target {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid var(--grey-border);
+  border-radius: 6px;
+  padding: 8px;
+}
+.study-target-image svg {
+  max-width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+.study-target-text {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 11px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.study-target-text.is-code {
+  font-family: var(--mono);
+  font-size: 10px;
+}
+.study-target-text .mark {
+  background: var(--yellow);
+}
+.study-done {
+  width: 100%;
+}
+.modal.rating {
+  width: 380px;
+  align-items: center;
+}
+.rating-scale {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--grey-text);
+}
+.rating-dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--grey-border);
+  background: var(--grey-bg);
+}
+.rating-dot:hover {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+.study-results {
+  border-collapse: collapse;
+  font-size: 13px;
+  width: 100%;
+}
+.study-results th,
+.study-results td {
+  border-bottom: 1px solid var(--grey-border);
+  padding: 4px 6px;
+  text-align: left;
+}
+.baseline {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+.baseline.with-study {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+}
+.baseline .chat {
+  min-width: 0;
 }

@@ -41,6 +41,8 @@ src/components/Toolbar.tsx     Reusable prompts (tools) with "?" slots
 src/components/EmptyState.tsx  Paste content or pick a sample
 src/components/Settings.tsx    API key / model dialog
 src/components/ChatView.tsx    ChatGPT replica (baseline of §4)
+src/study.ts                   Study activities: four tasks per content, with yellow highlights or a target image (§4.2-4.3)
+src/components/StudyPanel.tsx  Task panel (instruction, target, 3-min countdown), closeness rating, session summary
 src/styles.css
 ```
 
@@ -69,6 +71,7 @@ src/styles.css
 
 ## Selection and feedback
 
+- Gestures on text/code: a plain click selects the word or code token under the cursor (`wordAt`); a drag inside the panel is a native passage selection, converted to a `TextRef` on `mouseup`; a press that leaves the object panel turns into an object drag of the pressed word; a press starting inside an existing selection drags that selection. Ctrl/Cmd toggles a word in or out of the selection (a clicked word that overlaps a selected span removes it).
 - `TextView` renders the content as spans that preserve every character (Prism leaf tokens split further at mark boundaries), so DOM positions map to offsets with a `Range` (`offsetOf`). On `mouseup` the native selection is converted to a `TextRef`, trimmed of whitespace, and cleared (`removeAllRanges`) so the app's own highlight is what the user sees. Ctrl/Cmd adds or toggles spans. Marks: `m-sel`, `m-pulse`, `m-changed` (bold), `m-hover` (yellow, from hovering a chip), `m-slot`.
 - `SvgView` injects the normalized SVG with `innerHTML` and draws overlays (dashed boxes for elements, small squares for locations) computed from `getBoundingClientRect` / `getScreenCTM`. Elements inside `defs`, gradients, etc. are not selectable (`isSelectableSvgElement`). Pulsing adds a class to the SVG elements themselves.
 - After any selection completes, the prompt field is focused with the caret inside it, so "select, then type" works without clicking the field.
@@ -80,6 +83,8 @@ Custom pointer-based DnD (no HTML5 DnD, which does not work for SVG elements):
 1. `beginPotentialDrag` (`dnd.ts`) is called on `pointerdown` — inside a selected text span in `TextView`, or on any SVG element/empty spot in `SvgView`. It distinguishes a click (select) from a drag (> 4 px).
 2. `App.startDrag` renders a ghost chip following the pointer and calls `PromptField.dragOver(x, y)` on every move. The field computes the drop target from `caretPositionFromPoint`: inside a word → *replace that word* (yellow highlight); otherwise → *insert at caret* (blue bar).
 3. On release over the field, `PromptField.drop(refs)` inserts chips (`createChipElement`, `contenteditable=false`, `data-ref` JSON) with spaces around them so they behave like single words; dropped objects are removed from the selection.
+
+Dropping onto an existing chip replaces it (the drop spec has a `chip` kind); the drag ghost trails the cursor by a few pixels so it never covers the word that the drop would replace.
 
 `readParts` serializes the editor DOM back into `PromptPart[]` on submit. Backspace/Delete next to a chip removes it; copy/paste of chips is supported through the `text/html` clipboard flavour.
 
@@ -98,9 +103,14 @@ Conversation kept client-side and re-sent whole on every turn with the 2023 Chat
 
 The API call is isolated in `openai.ts`; during development the flows were verified in headless Chrome over the DevTools protocol with `Fetch` interception answering `api.openai.com` requests with canned SSE streams. Any such harness only needs to fulfil `POST https://api.openai.com/v1/chat/completions` with `text/event-stream` chunks of the form `data: {"choices":[{"delta":{"content":"…"}}]}` followed by `data: [DONE]`.
 
+## Study harness
+
+`STUDY_ACTIVITIES` (`src/study.ts`) lists six activities (two per domain), each with the paper's four tasks: an instruction string and either `highlights` (exact substrings of the starting content, shown in yellow by `highlightSegments`) or a `targetSvg` (the reproduction target, modelled on fig. 5). `App` keeps `{ activity, index, startedAt }`; `startTask` reloads the content and resets the history for every task; `StudyPanel` counts down `TASK_TIME_LIMIT_S` (180 s) and calls `onFinishTask(true)` at zero. Finishing raises `RatingDialog` (5-point distant→close), whose answer is stored with the elapsed time before the next task starts; after the last task `StudySummary` lists times and ratings. The panel sets `user-select: none` and swallows `dragstart`, and it lives outside the object panel, so nothing in it can become an object reference.
+
 ## Known limitations
 
 - `gpt-3.5-turbo` is used as named by the paper; if OpenAI stops serving it, change the model name in Settings.
 - Text object-words are matched by offsets, then by first occurrence of their text if the content changed underneath (e.g. after undo). If the text no longer exists an error toast is shown.
 - Thumbnails of SVG elements ignore ancestor transforms (they show the element in its own coordinate system).
+- An answer that is not renderable SVG is rejected while the object of interest is an image, so a prompt asking an image to be *described* reports an error instead of replacing the drawing.
 - Only the first fenced block of a model answer is used as the object; explanations around it are discarded, as DirectGPT "does less telling and more showing".

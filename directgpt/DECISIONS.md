@@ -81,6 +81,31 @@ Such a prompt has no verb, so it is executed but not added to the toolbar (an al
 
 §3.2.2 mentions "typing a prompt and then selecting". Typed prompts still require Enter to execute; a selection made while typing simply localizes the pending prompt (the "Apply to N selected elements" indicator updates live). Auto-executing on selection would fire before the user finished typing. Tools, whose verb is already complete, do execute on selection as the paper describes.
 
+## 7f. Click versus drag on text and code (added after grading)
+
+A plain click must select the word under the cursor (§3.2.2, "objects are selected with a click"), but the same press must also be able to (a) drag-select a passage and (b) drag the word into the prompt. Three gestures, one button.
+
+- (a) Click = select the word; press-and-drag *inside* the panel = native passage selection; press-and-drag *out of* the content panel (i.e. toward the prompt field) = object drag of the pressed word; press-and-drag starting inside an existing selection = object drag of that selection. **(default)**
+- (b) Require a modifier for the object drag.
+- (c) Long-press to start the object drag.
+
+Default (a) needs no modifier and no delay, and each gesture ends where its result is wanted.
+
+## 7g. Dropping an object onto an existing object-word
+
+The paper shows drops onto typed words and between words, not onto an existing chip.
+
+- (a) Replace the chip, exactly like dropping onto a typed word. **(default)**
+- (b) Insert a second chip next to it.
+
+## 7h. Model output that is not a valid image
+
+If the current object is an SVG and the answer contains no renderable SVG (prose, or broken markup), the answer is rejected: an error toast is shown, the image is kept, and no history entry or tool is created. Alternative: replace the image with whatever came back (loses the drawing).
+
+## 7i. Study session scope
+
+The study harness runs one activity (four tasks) at a time, chosen from the header. Content is reloaded and the undo history reset at every task; the toolbar is kept across tasks (the paper resets content between tasks but says nothing about tools, and TEST-TB07 accepts either). Ratings and times are kept in memory and shown in a summary at the end of the activity; there is no server to log to.
+
 ## 8. Model parameters
 
 The paper names only the model. Temperature, max tokens and other parameters are left at the API defaults. Model name defaults to `gpt-3.5-turbo` and can be changed in Settings.
