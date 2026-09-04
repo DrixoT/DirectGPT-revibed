@@ -16,7 +16,7 @@ import { SAMPLES } from './samples';
 import type { Sample } from './samples';
 import { loadSettings, saveSettings } from './settings';
 import { changedSvgIds, normalizeSvg } from './svg';
-import { sameRef } from './types';
+import { refLabel, sameRef } from './types';
 import type { ActiveTool, Content, ElementRef, LocationRef, ObjectRef, PromptPart, Range, Settings, TemplatePart, TextRef, Tool } from './types';
 import { useHistory } from './useHistory';
 
@@ -80,6 +80,7 @@ export default function App() {
   const [changedSvg, setChangedSvg] = useState<string[]>([]);
   const [hoverRef, setHoverRef] = useState<ObjectRef | null>(null);
   const [drag, setDrag] = useState<Drag | null>(null);
+  const [cursor, setCursor] = useState<{ x: number; y: number } | null>(null);
   const [preview, setPreview] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [samplesOpen, setSamplesOpen] = useState(false);
@@ -298,21 +299,23 @@ export default function App() {
   };
 
   const handleToolClick = (id: string) => {
-    if (activeTool?.id === id) {
+    const t = tools.find((x) => x.id === id);
+    if (!t) return;
+    if (activeTool?.id === id && selection.length === 0) {
       setActiveTool(null);
       return;
     }
-    const t = tools.find((x) => x.id === id);
-    if (!t) return;
     if (selection.length > 0) {
       // Noun-verb construction: the objects were selected first, the tool is used once (§3.2.3).
       if (t.slots === 0) {
+        setActiveTool(null);
         runTool(t, [], selection);
         return;
       }
       const filled = selection.slice(0, t.slots);
       setSelection([]);
       if (filled.length === t.slots) {
+        setActiveTool(null);
         runTool(t, filled, []);
         return;
       }
@@ -347,9 +350,30 @@ export default function App() {
     window.addEventListener('pointercancel', up);
   }, []);
 
+  // The cursor carries the active tool's label so the mode is visible where the user is pointing (§3.1, fig. 2c).
+  useEffect(() => {
+    if (!activeTool) {
+      setCursor(null);
+      return;
+    }
+    const move = (e: PointerEvent) => setCursor({ x: e.clientX, y: e.clientY });
+    window.addEventListener('pointermove', move);
+    return () => window.removeEventListener('pointermove', move);
+  }, [activeTool]);
+
   const slotRefs = activeTool?.filled ?? [];
   const pulse = pending?.targets ?? [];
   const status = pending ? `Generating… ${pending.received > 0 ? `${pending.received} characters received` : 'waiting for the model'}` : tool ? `Tool “${plainPromptText(templateToParts(tool.template, []).map((p) => (p.type === 'object' ? { type: 'text', text: '?' } : p)))}” active — ${tool.slots > 0 ? `click ${tool.slots - slotRefs.length} more object${tool.slots - slotRefs.length > 1 ? 's' : ''}` : 'select objects to apply it'} (Esc to leave)` : null;
+
+  /** The tool's label with its already-filled slots shown, the rest left as "?". */
+  const toolLabel = (t: Tool, filled: ObjectRef[]): TemplatePart[] => {
+    let i = 0;
+    return t.template.map((part) => {
+      if (part.type === 'text') return part;
+      const ref = filled[i++];
+      return ref ? { type: 'text', text: refLabel(ref) } : part;
+    });
+  };
 
   const groups: Array<Sample['group']> = ['Text', 'Code', 'Image'];
 
@@ -416,7 +440,7 @@ export default function App() {
                 ↷ Redo
               </button>
             </div>
-            <div className={`object-panel ${pending ? 'busy' : ''}`}>
+            <div className={`object-panel ${pending ? 'busy' : ''} ${tool ? 'tool-mode' : ''} ${pending && pulse.length === 0 ? 'working' : ''}`}>
               {content ? (
                 content.kind === 'svg' ? (
                   <SvgView
@@ -472,6 +496,12 @@ export default function App() {
         </div>
       ) : (
         <ChatView settings={settings} onNeedKey={() => setShowSettings(true)} onError={setError} seed={chatSeed} />
+      )}
+
+      {tool && cursor && !drag && !pending && (
+        <div className="tool-cursor" style={{ left: cursor.x, top: cursor.y }}>
+          {toolLabel(tool, slotRefs).map((p, i) => (p.type === 'text' ? <span key={i}>{p.text}</span> : <span key={i} className="slot">?</span>))}
+        </div>
       )}
 
       {drag && (

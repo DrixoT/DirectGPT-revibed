@@ -87,7 +87,8 @@ Custom pointer-based DnD (no HTML5 DnD, which does not work for SVG elements):
 
 `partsToTemplate` turns the executed prompt into a template. Clicking a tool:
 - with objects already selected → runs once (noun-verb): a 0-slot tool is localized to the selection; a k-slot tool consumes the first k selected objects;
-- otherwise enters a mode: `activeTool = { id, filled: [] }`. In `handleSelectionComplete`, 0-slot tools run on each completed (non-additive) selection; k-slot tools fill slots on each click and run when full, then reset their slots and stay active. Esc leaves the mode.
+- otherwise enters a mode: `activeTool = { id, filled: [] }`. While a mode is active, `App` tracks the pointer and renders `.tool-cursor`, a label showing the template with filled slots (§3.1).
+ In `handleSelectionComplete`, 0-slot tools run on each completed (non-additive) selection; k-slot tools fill slots on each click and run when full, then reset their slots and stay active. Ctrl/Cmd-selections accumulate instead, and clicking the (already active) tool applies it to them once and leaves the mode. Esc leaves the mode.
 
 ## ChatGPT replica (`ChatView`)
 

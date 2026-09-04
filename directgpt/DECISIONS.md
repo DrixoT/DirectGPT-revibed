@@ -57,6 +57,30 @@ Objects selected but not dropped stay selected (fig. 3c: location selected + pet
 - A tool with "?" slots stays active after executing (slots reset), until Esc or clicking it again. **(default)** Alternative: leave the mode after one execution.
 - Identical templates are not added twice; tools are appended in execution order and can be removed with the small ✕.
 
+## 7b. Cursor feedback for the active tool
+
+§3.1 says "With the cursor now indicating 'synonym', Sam selects a word", but the paper does not show the cursor's appearance.
+
+- (a) A label pinned to the mouse cursor showing the tool's template with its filled slots (`add a line from (100, 60) to ?`), plus a `copy` cursor shape over the object panel. **(default)**
+- (b) Only a CSS cursor change.
+- (c) Only the status line under the prompt field.
+
+## 7c. Prompts made exclusively of object-words
+
+Such a prompt has no verb, so it is executed but not added to the toolbar (an all-`?` button would carry no meaning). Alternative: add it anyway.
+
+## 7d. Loading feedback for prompts with no target
+
+§3.2.4 defines the pulse for objects selected or mentioned in the prompt. A global prompt targets nothing, so nothing would pulse.
+
+- (a) Pulse the border of the object panel — the object of interest as a whole is what is being acted on — plus the streaming status line. **(default)**
+- (b) Pulse the entire content.
+- (c) Status line only (no spatial feedback at all).
+
+## 7e. Executing the prompt field in a verb-noun order
+
+§3.2.2 mentions "typing a prompt and then selecting". Typed prompts still require Enter to execute; a selection made while typing simply localizes the pending prompt (the "Apply to N selected elements" indicator updates live). Auto-executing on selection would fire before the user finished typing. Tools, whose verb is already complete, do execute on selection as the paper describes.
+
 ## 8. Model parameters
 
 The paper names only the model. Temperature, max tokens and other parameters are left at the API defaults. Model name defaults to `gpt-3.5-turbo` and can be changed in Settings.

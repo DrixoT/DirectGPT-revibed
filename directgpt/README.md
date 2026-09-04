@@ -48,14 +48,18 @@ Dropping several selected objects at once inserts one chip per object.
 
 Every executed prompt becomes a button in the left **Toolbar**, with its object-words replaced by **?** (e.g. *add a line from ? to ?*).
 
+While a tool is active, its label follows the mouse cursor (showing slots already filled, e.g. *add a line from (100, 60) to ?*) so you can see the active tool where you are pointing.
+
 - **Verb then noun (mode)**: click a tool. For a tool without `?`, every selection you now make is immediately rewritten with that prompt (e.g. the *synonym* tool). For a tool with `?`, each click on an object fills the next `?` (the button shows it) and the prompt runs when all slots are filled. The mode stays active until you press **Esc** or click the tool again.
 - **Noun then verb (no mode)**: select objects first, then click the tool; the prompt runs once and no mode is entered.
+
+Clicking an active tool while objects are selected applies it to them right away; clicking it with nothing selected leaves the mode.
 
 Tools can be removed with the ✕ that appears on hover.
 
 ### 6. Feedback, stop, undo
 
-While a prompt runs, selected and referred objects pulse and the send button becomes a **Stop** button that cancels the request without changing anything. **Undo**/**Redo** (or Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z, Ctrl+Y) step through the history; an operation applied to several objects at once is a single undo step. **New** clears the content and the toolbar.
+While a prompt runs, selected and referred objects pulse (for a prompt targeting no particular object, the panel border pulses instead) and the send button becomes a **Stop** button that cancels the request without changing anything. **Undo**/**Redo** (or Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z, Ctrl+Y) step through the history; an operation applied to several objects at once is a single undo step. **New** clears the content and the toolbar.
 
 ## ChatGPT replica
 

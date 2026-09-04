@@ -19,3 +19,5 @@ Inventory of what the paper (Masson et al., CHI '24, "DirectGPT") specifies, tak
 | Markdown rendering in the ChatGPT replica (§4, library not named) | `marked` | Paper names no Markdown library | equivalent | none in rubric |
 | Object-word thumbnails (§3.2.2) | Standalone SVG of the element's bbox, or truncated text, or `(x, y)` | — | exact | refer tests |
 | Change highlighting after generation (fig. 2b, bold words) | Client-side word LCS diff → bold; SVG changed ids → fading outline | — | exact | feedback tests |
+| Cursor indicating the active tool (§3.1, appearance not shown) | Label pinned to the cursor with the tool template and its filled slots, plus a `copy` cursor over the panel | Paper shows no cursor design (DECISIONS.md §7b) | equivalent | tool tests |
+| Loading feedback when a prompt targets no object (§3.2.4 covers targeted pulses only) | Pulsing panel border + streaming status | Not specified for global prompts (DECISIONS.md §7d) | equivalent | feedback tests |

@@ -747,3 +747,50 @@ button.primary:disabled {
 .chat-body.markdown .token.url {
   background: transparent;
 }
+
+/* Cursor indicating the active tool (§3.1) */
+.tool-cursor {
+  position: fixed;
+  pointer-events: none;
+  z-index: 90;
+  transform: translate(14px, 14px);
+  background: var(--blue-soft);
+  border: 1px solid var(--blue);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 13px;
+  line-height: 18px;
+  white-space: nowrap;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+.tool-cursor .slot {
+  font-weight: 700;
+  color: #0b62b8;
+}
+.object-panel.tool-mode .text-view,
+.object-panel.tool-mode .svg-view {
+  cursor: copy;
+}
+
+/* Loading feedback for prompts that target no specific object (global prompts) */
+.object-panel.working::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: 8px;
+  animation: dgpt-working 1.4s ease-in-out infinite;
+  box-shadow: inset 0 0 0 2px var(--blue);
+}
+@keyframes dgpt-working {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
