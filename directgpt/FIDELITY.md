@@ -14,3 +14,8 @@ Inventory of what the paper (Masson et al., CHI '24, "DirectGPT") specifies, tak
 | ChatGPT replica system prompt "identical to the one used in ChatGPT" (§4) | not printed in the paper; builder's choice | The paper never prints the system prompt | degraded (baseline replica only, not DirectGPT's contribution) | none in rubric |
 | Streaming, word-by-word answers (§4) | streaming via Chat Completions `stream: true` | — | exact | feedback tests |
 | API key supplied server-side (implied by paper) | user enters their own OpenAI key in the browser UI, stored in localStorage | user requirement for this revibe | equivalent | none |
+| Localizing a prompt on SVG elements/locations (§3.2.2, no prompt printed) | A.1.3 form plus `Apply this only to element with id "c0" … Keep everything else in the SVG identical.` | The paper prints the localized prompt for text only (see DECISIONS.md §2) | equivalent | image localize tests |
+| Global prompt on text/code with no selection (§3.2.2, no prompt printed) | `content\n\ninstruction` with a short system message asking for the full modified text/code | Not printed in the paper (DECISIONS.md §3) | equivalent | global tasks |
+| Markdown rendering in the ChatGPT replica (§4, library not named) | `marked` | Paper names no Markdown library | equivalent | none in rubric |
+| Object-word thumbnails (§3.2.2) | Standalone SVG of the element's bbox, or truncated text, or `(x, y)` | — | exact | refer tests |
+| Change highlighting after generation (fig. 2b, bold words) | Client-side word LCS diff → bold; SVG changed ids → fading outline | — | exact | feedback tests |

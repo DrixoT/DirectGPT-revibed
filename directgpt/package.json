@@ -1,0 +1,28 @@
+{
+  "name": "directgpt",
+  "private": true,
+  "version": "1.0.0",
+  "description": "DirectGPT: a direct manipulation interface to interact with large language models (reimplementation of Masson et al., CHI 2024)",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5173",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "preview": "vite preview --port 5173"
+  },
+  "dependencies": {
+    "marked": "^18.0.11",
+    "openai": "^4.104.0",
+    "prismjs": "^1.30.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/prismjs": "^1.26.5",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.0"
+  }
+}
