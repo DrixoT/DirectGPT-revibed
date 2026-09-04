@@ -121,7 +121,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-G02: Generate an initial object of interest from a prompt
 
@@ -144,7 +143,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-G03: Load existing content as the starting object of interest
 
@@ -166,7 +164,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-G04: Output is continuously represented at a fixed position and updated in place
 
@@ -189,7 +186,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-G05: Global prompt with no selection behaves like ChatGPT
 
@@ -211,7 +207,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-G06: Prompt field accepts Enter and send-button execution
 
@@ -232,7 +227,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ---
 
@@ -258,7 +252,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-T02: Ctrl+click builds a multi-word selection
 
@@ -281,7 +274,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-T03: Localized prompt (noun-verb): select words, then prompt "synonym"
 
@@ -304,7 +296,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-T04: Localized prompt (verb-noun): type the prompt first, then select
 
@@ -327,7 +318,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-T05: Selecting a longer passage and summarizing it in place
 
@@ -348,7 +338,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-T06: Drag a word from the text into the prompt to create an object-word
 
@@ -372,7 +361,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-T07: Executing a prompt with text object-words disambiguates repeated words
 
@@ -394,7 +382,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-T08: Object-words behave like single words (delete, copy) and hovering highlights the source
 
@@ -417,7 +404,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-T09: Global text transformation without selection (future tense)
 
@@ -437,7 +423,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ---
 
@@ -464,7 +449,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-C02: Localized code edit: rename a variable by selecting it
 
@@ -486,7 +470,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-C03: Localized code edit on a multi-line selection: convert a for loop into a while loop
 
@@ -507,7 +490,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-C04: Global code transformation: convert the function to Python
 
@@ -527,7 +509,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-C05: Drag a code token into the prompt and reference it
 
@@ -549,7 +530,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ---
 
@@ -576,7 +556,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-I02: Localized image edit: gradient on three selected petals
 
@@ -597,7 +576,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-I03: Localized image edit: remove selected elements
 
@@ -619,7 +597,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-I04: Drag a shape into the prompt: thumbnail object-word
 
@@ -642,7 +619,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-I05: Drag an empty canvas location into the prompt: coordinate object-word
 
@@ -664,7 +640,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-I06: Drop between words (back-and-forth composition) and hover-highlight of the referenced shape
 
@@ -688,7 +663,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-I07: Reference another shape to copy its properties ("add a circle like this")
 
@@ -710,7 +684,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-I08: Auto-assigned unique ids on SVG elements
 
@@ -735,7 +708,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-I09: Global image transformation (upside down)
 
@@ -755,7 +727,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ---
 
@@ -782,7 +753,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-TB02: Using a single-noun tool as a mode (verb-noun): click tool, then click words
 
@@ -806,7 +776,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-TB03: Using a tool once on a pre-existing selection (noun-verb, no mode)
 
@@ -828,7 +797,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-TB04: Multi-noun prompt is abstracted with "?" placeholders
 
@@ -848,7 +816,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-TB05: Multi-noun tool binds nouns click-by-click and executes on the last click
 
@@ -873,7 +840,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-TB06: Multi-noun tool applied to a pre-existing multi-selection
 
@@ -894,7 +860,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-TB07: Tools persist across content changes and across content types
 
@@ -916,7 +881,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-TB08: Toolbar is visible and readable with many tools
 
@@ -937,7 +901,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ---
 
@@ -964,7 +927,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-FB02: Objects referenced by object-words pulse during execution
 
@@ -985,7 +947,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-FB03: Stop button cancels a generation in progress
 
@@ -1007,7 +968,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-FB04: Modified parts are highlighted after execution
 
@@ -1029,7 +989,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-FB05: Feedback and pulsing on SVG shapes during a localized edit
 
@@ -1051,7 +1010,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ---
 
@@ -1077,7 +1035,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-U02: Keyboard shortcuts for undo and redo
 
@@ -1099,7 +1056,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-U03: Undo granularity matches the user's operation (multi-selection = one step)
 
@@ -1121,7 +1077,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-U04: Undo across a sequence of operations and branch on new action
 
@@ -1145,7 +1100,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-U05: Undo/Redo disabled state when nothing to undo/redo
 
@@ -1167,7 +1121,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ### TEST-U06: Undo after a tool-mode operation
 
@@ -1188,7 +1141,6 @@ printPyramid(5);
 
 **Observed result:**
 
-<br>
 
 ---
 
@@ -1217,7 +1169,6 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
-<br>
 
 ### TEST-S02: Content is pre-loaded per task and reset between tasks; 3-minute limit and closeness rating
 
@@ -1240,7 +1191,6 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
-<br>
 
 ### TEST-S03: ChatGPT-replica baseline streams word by word, renders Markdown/code, and renders SVGs
 
@@ -1263,7 +1213,6 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
-<br>
 
 ---
 
@@ -1291,7 +1240,6 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
-<br>
 
 ### TEST-INT02: End-to-end use case, part 2: drawing the flower (section 3.1, figures 3-4)
 
@@ -1315,7 +1263,6 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
-<br>
 
 ### TEST-INT03: Localization plus references plus toolbar plus undo in code
 
@@ -1338,7 +1285,6 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
-<br>
 
 ### TEST-INT04: Switching between local and global prompts mid-composition
 
@@ -1360,7 +1306,6 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
-<br>
 
 ### TEST-INT05: Object-word thumbnails stay in sync after undo
 
@@ -1383,7 +1328,6 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
-<br>
 
 ---
 
@@ -1408,7 +1352,6 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
-<br>
 
 ### TEST-EC02: Localized prompt where the model returns extra text
 
@@ -1429,7 +1372,6 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
-<br>
 
 ### TEST-EC03: Very short prompts ("red") on selected shapes
 
@@ -1449,7 +1391,6 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
-<br>
 
 ### TEST-EC04: Selection of the same word twice, and selection reset after execution
 
@@ -1471,7 +1412,6 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
-<br>
 
 ### TEST-EC05: Dropping an object onto an existing object-word replaces it
 
@@ -1492,7 +1432,6 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
-<br>
 
 ### TEST-EC06: Model error / network failure during execution
 
@@ -1513,7 +1452,6 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
-<br>
 
 ### TEST-EC07: Invalid SVG returned by the model for an image edit
 
@@ -1534,7 +1472,6 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
-<br>
 
 ### TEST-EC08: Multiple identical prompts and toolbar deduplication
 
@@ -1555,7 +1492,6 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
-<br>
 
 ### TEST-EC09: Tool mode interaction with the prompt field and Escape
 
@@ -1578,7 +1514,6 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
-<br>
 
 ### TEST-EC10: Long text content and selection near scroll boundaries
 
@@ -1599,7 +1534,6 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
-<br>
 
 ### TEST-EC11: Localized prompt on a shape whose SVG code is non-contiguous (group / use)
 
@@ -1624,7 +1558,6 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
-<br>
 
 ### TEST-EC12: Keyboard-only clearing of selection and badge behavior with 0 elements
 
@@ -1647,4 +1580,3 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
-<br>
