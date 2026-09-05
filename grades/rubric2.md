@@ -121,6 +121,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-G02: Generate an initial object of interest from a prompt
 
@@ -143,6 +145,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-G03: Load existing content as the starting object of interest
 
@@ -163,6 +167,8 @@ printPyramid(5);
 - Failure: No way to bring in existing content; the content must be generated from scratch every time.
 
 **Observed result:**
+
+Full Success
 
 
 ### TEST-G04: Output is continuously represented at a fixed position and updated in place
@@ -186,6 +192,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-G05: Global prompt with no selection behaves like ChatGPT
 
@@ -207,6 +215,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-G06: Prompt field accepts Enter and send-button execution
 
@@ -226,6 +236,8 @@ printPyramid(5);
 - Failure: Prompts cannot be executed.
 
 **Observed result:**
+
+Full Success
 
 
 ---
@@ -252,6 +264,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-T02: Ctrl+click builds a multi-word selection
 
@@ -273,6 +287,8 @@ printPyramid(5);
 - Failure: Only one element can ever be selected.
 
 **Observed result:**
+
+Full Success
 
 
 ### TEST-T03: Localized prompt (noun-verb): select words, then prompt "synonym"
@@ -296,6 +312,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-T04: Localized prompt (verb-noun): type the prompt first, then select
 
@@ -318,6 +336,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-T05: Selecting a longer passage and summarizing it in place
 
@@ -337,6 +357,8 @@ printPyramid(5);
 - Failure: Multi-word passages cannot be localized; the whole text is rewritten.
 
 **Observed result:**
+
+Full Success
 
 
 ### TEST-T06: Drag a word from the text into the prompt to create an object-word
@@ -361,6 +383,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-T07: Executing a prompt with text object-words disambiguates repeated words
 
@@ -381,6 +405,8 @@ printPyramid(5);
 - Failure: Referenced words are not changed, or the whole text is rewritten.
 
 **Observed result:**
+
+Full Success
 
 
 ### TEST-T08: Object-words behave like single words (delete, copy) and hovering highlights the source
@@ -404,6 +430,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-T09: Global text transformation without selection (future tense)
 
@@ -422,6 +450,8 @@ printPyramid(5);
 - Failure: Global text prompts are unsupported.
 
 **Observed result:**
+
+Full Success
 
 
 ---
@@ -449,6 +479,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-C02: Localized code edit: rename a variable by selecting it
 
@@ -470,6 +502,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-C03: Localized code edit on a multi-line selection: convert a for loop into a while loop
 
@@ -490,6 +524,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-C04: Global code transformation: convert the function to Python
 
@@ -508,6 +544,8 @@ printPyramid(5);
 - Failure: Global code prompts unsupported.
 
 **Observed result:**
+
+Full Success
 
 
 ### TEST-C05: Drag a code token into the prompt and reference it
@@ -529,6 +567,8 @@ printPyramid(5);
 - Failure: Cannot drag code tokens into the prompt.
 
 **Observed result:**
+
+Full Success
 
 
 ---
@@ -556,6 +596,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-I02: Localized image edit: gradient on three selected petals
 
@@ -575,6 +617,8 @@ printPyramid(5);
 - Failure: No change, whole image recoloured, or SVG becomes invalid/blank.
 
 **Observed result:**
+
+Full Success
 
 
 ### TEST-I03: Localized image edit: remove selected elements
@@ -596,6 +640,8 @@ printPyramid(5);
 - Failure: Wrong element removed or nothing removed.
 
 **Observed result:**
+
+Full Success
 
 
 ### TEST-I04: Drag a shape into the prompt: thumbnail object-word
@@ -619,6 +665,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-I05: Drag an empty canvas location into the prompt: coordinate object-word
 
@@ -639,6 +687,8 @@ printPyramid(5);
 - Failure: Cannot drag from empty canvas; locations cannot be referenced.
 
 **Observed result:**
+
+Full Success
 
 
 ### TEST-I06: Drop between words (back-and-forth composition) and hover-highlight of the referenced shape
@@ -663,6 +713,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-I07: Reference another shape to copy its properties ("add a circle like this")
 
@@ -683,6 +735,8 @@ printPyramid(5);
 - Failure: Selection and reference cannot be combined in one prompt.
 
 **Observed result:**
+
+Full Success
 
 
 ### TEST-I08: Auto-assigned unique ids on SVG elements
@@ -708,6 +762,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-I09: Global image transformation (upside down)
 
@@ -726,6 +782,8 @@ printPyramid(5);
 - Failure: Not possible.
 
 **Observed result:**
+
+Full Success
 
 
 ---
@@ -753,6 +811,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-TB02: Using a single-noun tool as a mode (verb-noun): click tool, then click words
 
@@ -776,6 +836,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-TB03: Using a tool once on a pre-existing selection (noun-verb, no mode)
 
@@ -797,6 +859,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-TB04: Multi-noun prompt is abstracted with "?" placeholders
 
@@ -815,6 +879,8 @@ printPyramid(5);
 - Failure: Prompts with object-words are not added to the toolbar.
 
 **Observed result:**
+
+Full Success
 
 
 ### TEST-TB05: Multi-noun tool binds nouns click-by-click and executes on the last click
@@ -840,6 +906,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-TB06: Multi-noun tool applied to a pre-existing multi-selection
 
@@ -859,6 +927,8 @@ printPyramid(5);
 - Failure: Tool ignores the selection or requires re-clicking the objects.
 
 **Observed result:**
+
+Full Success
 
 
 ### TEST-TB07: Tools persist across content changes and across content types
@@ -881,6 +951,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-TB08: Toolbar is visible and readable with many tools
 
@@ -900,6 +972,8 @@ printPyramid(5);
 - Failure: Toolbar breaks the layout or stops adding tools.
 
 **Observed result:**
+
+Full Success
 
 
 ---
@@ -927,6 +1001,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-FB02: Objects referenced by object-words pulse during execution
 
@@ -946,6 +1022,8 @@ printPyramid(5);
 - Failure: No targeted feedback for references.
 
 **Observed result:**
+
+Full Success
 
 
 ### TEST-FB03: Stop button cancels a generation in progress
@@ -968,6 +1046,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-FB04: Modified parts are highlighted after execution
 
@@ -989,6 +1069,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-FB05: Feedback and pulsing on SVG shapes during a localized edit
 
@@ -1009,6 +1091,8 @@ printPyramid(5);
 - Failure: No shape feedback.
 
 **Observed result:**
+
+Full Success
 
 
 ---
@@ -1035,6 +1119,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-U02: Keyboard shortcuts for undo and redo
 
@@ -1056,6 +1142,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-U03: Undo granularity matches the user's operation (multi-selection = one step)
 
@@ -1076,6 +1164,8 @@ printPyramid(5);
 - Failure: Undo fails on multi-selection operations.
 
 **Observed result:**
+
+Full Success
 
 
 ### TEST-U04: Undo across a sequence of operations and branch on new action
@@ -1100,6 +1190,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-U05: Undo/Redo disabled state when nothing to undo/redo
 
@@ -1121,6 +1213,8 @@ printPyramid(5);
 
 **Observed result:**
 
+Partial Success: Undo/Redo disabled states track the app's real history, but loading content is itself pushed onto the undo stack, so they do not match the rubric's expectation. Observed with the Undo/Redo buttons in the history bar: in a completely empty session both are disabled (correct); after loading Fixture TEXT with "Use this content" (no prompt executed yet) Undo is already ENABLED and Redo disabled (expected: both greyed); after executing one localized `synonym` Undo enabled / Redo disabled (correct); after clicking Undo once, Undo stays ENABLED (it can still undo the content load) and Redo is enabled (expected: Undo disabled). Clicking Undo again clears the panel back to the empty paste/sample screen. Nothing errors or corrupts; the deviation is purely that the content-load step occupies an undo slot the rubric assumes does not exist.
+
 
 ### TEST-U06: Undo after a tool-mode operation
 
@@ -1140,6 +1234,8 @@ printPyramid(5);
 - Failure: Tool-driven edits cannot be undone.
 
 **Observed result:**
+
+Full Success
 
 
 ---
@@ -1169,6 +1265,8 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-S02: Content is pre-loaded per task and reset between tasks; 3-minute limit and closeness rating
 
@@ -1191,6 +1289,8 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-S03: ChatGPT-replica baseline streams word by word, renders Markdown/code, and renders SVGs
 
@@ -1212,6 +1312,8 @@ These tests apply only if the implementation includes the study harness or the C
 - Failure: No baseline.
 
 **Observed result:**
+
+Full Success
 
 
 ---
@@ -1240,6 +1342,8 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-INT02: End-to-end use case, part 2: drawing the flower (section 3.1, figures 3-4)
 
@@ -1263,6 +1367,8 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-INT03: Localization plus references plus toolbar plus undo in code
 
@@ -1285,6 +1391,8 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-INT04: Switching between local and global prompts mid-composition
 
@@ -1305,6 +1413,8 @@ These tests apply only if the implementation includes the study harness or the C
 - Failure: Scope cannot be changed once typing started.
 
 **Observed result:**
+
+Full Success
 
 
 ### TEST-INT05: Object-word thumbnails stay in sync after undo
@@ -1327,6 +1437,8 @@ These tests apply only if the implementation includes the study harness or the C
 - Failure: Execution errors or targets a different shape.
 
 **Observed result:**
+
+Partial Success: the reference survives Undo but the chip thumbnail is stale. After `make it red` on petal c3 and dragging the now-red petal into the prompt (`move [petal] to the left`), clicking Undo turns the petal black again; hovering the chip still highlights the correct petal (overlay box on c3) and Enter sends `... to move element with id "c3" to the left`, so the reference is intact. However the chip in the prompt field still renders the red thumbnail (chip SVG keeps fill="red") while the petal on the canvas is black, i.e. the thumbnail is stale and misleading.
 
 
 ---
@@ -1352,6 +1464,8 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-EC02: Localized prompt where the model returns extra text
 
@@ -1372,6 +1486,8 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
+Partial Success: the replacement is correctly confined to the selection and the leading `<blank>: ` label is stripped, but quotation artifacts are not. With the default model reply the run is clean (`bank` -> `riverbank`, rest byte-identical). Forcing the model to answer `<blank>: "riverbank"\n\nHere is a three paragraph explanation of the word.` for the same selection inserted `"riverbank"\n\nHere is a three paragraph explanation of the word.` in place of `bank` - the `<blank>:` prefix was trimmed but the surrounding double quotes were kept verbatim, which the Full-Success criterion lists as a leaked wrapper artifact.
+
 
 ### TEST-EC03: Very short prompts ("red") on selected shapes
 
@@ -1390,6 +1506,8 @@ These tests apply only if the implementation includes the study harness or the C
 - Failure: Short prompt fails or produces an error.
 
 **Observed result:**
+
+Full Success
 
 
 ### TEST-EC04: Selection of the same word twice, and selection reset after execution
@@ -1412,6 +1530,8 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-EC05: Dropping an object onto an existing object-word replaces it
 
@@ -1431,6 +1551,8 @@ These tests apply only if the implementation includes the study harness or the C
 - Failure: Drop onto a chip is rejected or corrupts the prompt.
 
 **Observed result:**
+
+Full Success
 
 
 ### TEST-EC06: Model error / network failure during execution
@@ -1452,6 +1574,8 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
+Partial Success: the failure is completely silent. With the API forced to return HTTP 500 for a localized `synonym` on `bank`: pulsing stops, the content is byte-identical, no toolbar button is created, no undo entry is added (Undo still only rolls back the content load) and the prompt text `synonym` plus the selection are kept for retry - all correct. But no error message appears anywhere: the "Generating... waiting for the model" line in `.prompt-status` simply blanks out, there is no toast/banner/inline error element in the DOM, and the only trace is a console `500 (Internal Server Error)`. The user gets no indication that the prompt failed, contrary to "an unobtrusive error message appears".
+
 
 ### TEST-EC07: Invalid SVG returned by the model for an image edit
 
@@ -1472,6 +1596,8 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-EC08: Multiple identical prompts and toolbar deduplication
 
@@ -1491,6 +1617,8 @@ These tests apply only if the implementation includes the study harness or the C
 - Failure: Second execution breaks the toolbar.
 
 **Observed result:**
+
+Full Success
 
 
 ### TEST-EC09: Tool mode interaction with the prompt field and Escape
@@ -1514,6 +1642,8 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-EC10: Long text content and selection near scroll boundaries
 
@@ -1533,6 +1663,8 @@ These tests apply only if the implementation includes the study harness or the C
 - Failure: Long content breaks selection or layout.
 
 **Observed result:**
+
+Full Success
 
 
 ### TEST-EC11: Localized prompt on a shape whose SVG code is non-contiguous (group / use)
@@ -1558,6 +1690,8 @@ These tests apply only if the implementation includes the study harness or the C
 
 **Observed result:**
 
+Full Success
+
 
 ### TEST-EC12: Keyboard-only clearing of selection and badge behavior with 0 elements
 
@@ -1579,4 +1713,6 @@ These tests apply only if the implementation includes the study harness or the C
 - Failure: Stuck badge with 0 or a stale count.
 
 **Observed result:**
+
+Full Success
 
