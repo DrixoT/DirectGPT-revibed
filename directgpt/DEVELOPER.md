@@ -66,7 +66,7 @@ src/styles.css
    - **text/code with object-words** (A.1.2): the passage with `0]word0]`, `1]word1]` delimiters, the instruction with `text delimited by 0]`, and `Keep rest of the text identical`;
    - **global**: content + instruction with a system message asking for the full modified text/code.
 3. All requests run in parallel through `streamChat` with a shared `AbortController` (Stop button). While pending, `pending.targets` (selection ∪ referred objects) are rendered with the pulse animation (§3.2.4).
-4. The answer is applied: localized answers (`extractLocalized`) are spliced into the spans; whole answers go through `extractObject`, which takes the SVG if there is one, else the first fenced code block (language from the fence), else the text. Kind can change (e.g. "convert to Python" keeps `code` but switches `language`; "draw…" on text yields `svg`).
+4. The answer is applied: localized answers (`extractLocalized`, which also strips a `<blank>:` label and the quotes models wrap a replacement in, unless the selection itself was quoted) are spliced into the spans; whole answers go through `extractObject`, which takes the SVG if there is one, else the first fenced code block (language from the fence), else the text. Kind can change (e.g. "convert to Python" keeps `code` but switches `language`; "draw…" on text yields `svg`).
 5. The new content is pushed to history (one entry per user operation), changes are highlighted (`diff.changedRanges` for text/code, `svg.changedSvgIds` for SVG), the selection is cleared, and the prompt is added to the toolbar as a tool (deduplicated by template).
 
 ## Selection and feedback
@@ -107,10 +107,14 @@ The API call is isolated in `openai.ts`; during development the flows were verif
 
 `STUDY_ACTIVITIES` (`src/study.ts`) lists six activities (two per domain), each with the paper's four tasks: an instruction string and either `highlights` (exact substrings of the starting content, shown in yellow by `highlightSegments`) or a `targetSvg` (the reproduction target, modelled on fig. 5). `App` keeps `{ activity, index, startedAt }`; `startTask` reloads the content and resets the history for every task; `StudyPanel` counts down `TASK_TIME_LIMIT_S` (180 s) and calls `onFinishTask(true)` at zero. Finishing raises `RatingDialog` (5-point distant→close), whose answer is stored with the elapsed time before the next task starts; after the last task `StudySummary` lists times and ratings. The panel sets `user-select: none` and swallows `dragstart`, and it lives outside the object panel, so nothing in it can become an object reference.
 
+## Errors and history
+
+A failed request leaves the content, the toolbar and the undo history untouched, keeps the prompt and the selection for a retry, and reports itself in two places until dismissed: `.gen-status.is-error` under the prompt field and a dismissable toast. `describeError` guarantees a readable sentence even for errors carrying no message. Loading content calls `history.reset`, so only real operations occupy undo steps.
+
 ## Known limitations
 
 - `gpt-3.5-turbo` is used as named by the paper; if OpenAI stops serving it, change the model name in Settings.
-- Text object-words are matched by offsets, then by first occurrence of their text if the content changed underneath (e.g. after undo). If the text no longer exists an error toast is shown.
+- Text object-words are matched by offsets, then by first occurrence of their text if the content changed underneath (e.g. after undo). If the text no longer exists an error toast is shown. Element object-words are re-rendered from the live image after every content change (`refreshElementRef` + `PromptFieldHandle.refreshRefs`), so their thumbnails never go stale; one whose element has disappeared is marked `broken` and refuses to execute.
 - Thumbnails of SVG elements ignore ancestor transforms (they show the element in its own coordinate system).
 - An answer that is not renderable SVG is rejected while the object of interest is an image, so a prompt asking an image to be *described* reports an error instead of replacing the drawing.
 - Only the first fenced block of a model answer is used as the object; explanations around it are discarded, as DirectGPT "does less telling and more showing".

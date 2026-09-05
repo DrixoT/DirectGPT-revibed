@@ -26,3 +26,7 @@ Inventory of what the paper (Masson et al., CHI '24, "DirectGPT") specifies, tak
 | Three-minute task limit (§4.2) | 180 s countdown in the task panel, auto-finishes the task | — | exact | TEST-S02 |
 | 5-point "How close are you to the target" rating after each task (§4.2) | Modal with distant→close 1-5 scale, results shown in an end-of-activity summary | Kept in memory; the paper logged to a server | equivalent | TEST-S02 |
 | Study targets for the image activity (fig. 5) | Hand-built target SVGs for the four flower and four smiley tasks | Redrawn from the figure | equivalent | TEST-S01 |
+| Undo/Redo greyed until an operation exists (fig. 3a) | Loading content resets the history; only prompts create undo steps | — | exact | TEST-U05 |
+| Localized answer is the rewritten selection only (App. A.1.1) | Strips a `<blank>:` label and quotes wrapping the replacement, keeping quotes that belong to the selection | Quoting is a habit of the model, not content (DECISIONS.md §7k) | exact | TEST-EC02 |
+| Object-word rendered as a thumbnail of the object (§3.2.2) | Thumbnails re-render from the live image after every change; a vanished object marks the chip broken and blocks execution | Paper does not cover references invalidated by undo (DECISIONS.md §7l) | exact | TEST-INT05 |
+| Behaviour on a failed request (not covered by the paper) | Content, toolbar and history untouched; prompt and selection kept; message under the prompt field and in a dismissable toast | — | equivalent | TEST-EC06 |

@@ -1,10 +1,13 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import type React from 'react';
-import { createChipElement, refFromChip } from '../chip';
+import { chipInnerHTML, createChipElement, refFromChip } from '../chip';
+import { refreshElementRef } from '../svg';
 import { refLabel } from '../types';
-import type { ObjectRef, PromptPart } from '../types';
+import type { Content, ObjectRef, PromptPart } from '../types';
 
 export interface PromptFieldHandle {
+  /** Re-renders object-words against the current object of interest (§3.2.2 thumbnails). */
+  refreshRefs: (content: Content | null) => void;
   /** Called while dragging an object over the page. Returns true when the pointer is over the field. */
   dragOver: (x: number, y: number) => boolean;
   /** Drops object-words at the position computed by the last `dragOver`. */
@@ -17,6 +20,7 @@ export interface PromptFieldHandle {
 interface Props {
   generating: boolean;
   status: string | null;
+  error: string | null;
   selectionCount: number;
   onSubmit: (parts: PromptPart[]) => void;
   onStop: () => void;
@@ -120,7 +124,7 @@ export function partsAreEmpty(parts: PromptPart[]): boolean {
 }
 
 const PromptField = forwardRef<PromptFieldHandle, Props>(function PromptField(
-  { generating, status, selectionCount, onSubmit, onStop, onClearSelection, onHoverRef },
+  { generating, status, error, selectionCount, onSubmit, onStop, onClearSelection, onHoverRef },
   ref,
 ) {
   const wrapper = useRef<HTMLDivElement>(null);
@@ -302,6 +306,29 @@ const PromptField = forwardRef<PromptFieldHandle, Props>(function PromptField(
         clearIndicator();
       },
       dragEnd: () => clearIndicator(),
+      refreshRefs: (content) => {
+        const ed = editor.current;
+        if (!ed) return;
+        ed.querySelectorAll('.chip').forEach((node) => {
+          const chip = node as HTMLElement;
+          const ref = refFromChip(chip);
+          if (!ref) return;
+          let fresh: ObjectRef | null = ref;
+          if (ref.type === 'element') fresh = content?.kind === 'svg' ? refreshElementRef(ref) : null;
+          else if (ref.type === 'text') fresh = content && content.kind !== 'svg' && content.value.includes(ref.text) ? ref : null;
+          if (!fresh) {
+            chip.classList.add('broken');
+            chip.title = 'This object is no longer in the content';
+            return;
+          }
+          chip.classList.remove('broken');
+          chip.removeAttribute('title');
+          if (fresh !== ref) {
+            chip.dataset.ref = JSON.stringify(fresh);
+            chip.innerHTML = chipInnerHTML(fresh);
+          }
+        });
+      },
       clear: () => {
         if (editor.current) editor.current.innerHTML = '';
         setEmpty(true);
@@ -449,7 +476,7 @@ const PromptField = forwardRef<PromptFieldHandle, Props>(function PromptField(
         )}
       </div>
       <div className="prompt-status">
-        <div className="gen-status">{status ?? ''}</div>
+        {error ? <div className="gen-status is-error">{error}</div> : <div className="gen-status">{status ?? ''}</div>}
         {selectionCount > 0 && (
           <div className="apply-chip">
             <button type="button" onClick={onClearSelection} title="Clear selection (Esc)">

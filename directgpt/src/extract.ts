@@ -73,11 +73,29 @@ export function extractObject(response: string, current: Content | null): Conten
   return { kind: 'text', value: text };
 }
 
-/** The answer to a localized prompt (A.1.1) is only the rewritten selection. */
-export function extractLocalized(response: string): string {
+const QUOTE_PAIRS: Record<string, string> = { '"': '"', "'": "'", '\u00ab': '\u00bb', '\u201c': '\u201d', '\u2018': '\u2019' };
+
+/**
+ * The answer to a localized prompt (A.1.1) is only the rewritten selection. Models often
+ * wrap that replacement in quotes, and sometimes follow it with an explanation; both are
+ * wrappers around the answer, not part of the text, so they are trimmed. Quotes are kept
+ * when the selection itself started with one, since they are then part of the content.
+ */
+export function extractLocalized(response: string, original?: string): string {
   let s = response.trim();
   const fence = FENCE.exec(s);
   if (fence) s = fence[2].replace(/\s+$/, '');
-  s = s.replace(/^<blank>\s*:\s*/i, '');
+  s = s.replace(/^<blank>\s*:\s*/i, '').trim();
+
+  const originalQuoted = original !== undefined && /^["'\u00ab\u201c\u2018]/.test(original.trim());
+  const close = QUOTE_PAIRS[s[0]];
+  if (!originalQuoted && close) {
+    const end = s.indexOf(close, 1);
+    if (end > 0) {
+      const rest = s.slice(end + 1);
+      // "word" -> word, and "word"\n\nexplanation -> word, but "word" said Alice stays whole.
+      if (rest.trim() === '' || /^\s*\n/.test(rest)) s = s.slice(1, end);
+    }
+  }
   return s.trim();
 }

@@ -38,7 +38,7 @@ The prompt field shows **Apply to N selected elements**. Now type only the verb 
 
 ### 4. Refer to objects: drag them into the prompt
 
-Drag a word or code token straight out of the content panel (a whole passage is dragged by selecting it first, then pressing inside the selection), or drag an SVG element or an empty spot of the image, and drop it **onto a word** of the prompt (the word turns yellow and is replaced) or **between words** (a blue caret shows the insertion point). The object becomes an *object-word*: a grey chip showing the word, a thumbnail of the shape, or `(x, y)` for a location. Chips can be deleted with Backspace/Delete and copied, cut and pasted like words; dropping another object onto a chip replaces it. Hovering a chip highlights the object in the output.
+Drag a word or code token straight out of the content panel (a whole passage is dragged by selecting it first, then pressing inside the selection), or drag an SVG element or an empty spot of the image, and drop it **onto a word** of the prompt (the word turns yellow and is replaced) or **between words** (a blue caret shows the insertion point). The object becomes an *object-word*: a grey chip showing the word, a thumbnail of the shape, or `(x, y)` for a location. Chips can be deleted with Backspace/Delete and copied, cut and pasted like words; dropping another object onto a chip replaces it. A chip's thumbnail follows its object, so it stays accurate after an edit or an undo; if the object disappears the chip is marked with a dashed red outline and the prompt refuses to run until it is removed. Hovering a chip highlights the object in the output.
 
 Examples: type *add a line from here to there*, then drop two locations on *here* and *there*; type *replace this and that with synonyms* and drop two words; select a location, type *add a circle like this* and drop a petal on *this*.
 
@@ -59,7 +59,7 @@ Tools can be removed with the ✕ that appears on hover.
 
 ### 6. Feedback, stop, undo
 
-While a prompt runs, selected and referred objects pulse (for a prompt targeting no particular object, the panel border pulses instead) and the send button becomes a **Stop** button that cancels the request without changing anything. **Undo**/**Redo** (or Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z, Ctrl+Y) step through the history; an operation applied to several objects at once is a single undo step. **New** clears the content and the toolbar.
+While a prompt runs, selected and referred objects pulse (for a prompt targeting no particular object, the panel border pulses instead) and the send button becomes a **Stop** button that cancels the request without changing anything. If a request fails, the content is left untouched and the reason appears under the prompt field and as a dismissable message; the prompt and selection are kept so it can be retried. **Undo**/**Redo** (or Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z, Ctrl+Y) step through the history; an operation applied to several objects at once is a single undo step. **New** clears the content and the toolbar.
 
 ## ChatGPT replica
 

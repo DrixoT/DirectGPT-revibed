@@ -106,6 +106,27 @@ If the current object is an SVG and the answer contains no renderable SVG (prose
 
 The study harness runs one activity (four tasks) at a time, chosen from the header. Content is reloaded and the undo history reset at every task; the toolbar is kept across tasks (the paper resets content between tasks but says nothing about tools, and TEST-TB07 accepts either). Ratings and times are kept in memory and shown in a summary at the end of the activity; there is no server to log to.
 
+## 7j. Is loading content an undoable step? (revised after grading)
+
+Loading the starting content (pasting, a study sample, a study task) now *resets* the history instead of pushing onto it, so a freshly loaded document has nothing to undo and both buttons are greyed, matching fig. 3a. Generating the first object from a prompt is still an operation, so undoing it returns to the empty screen. Alternative: keep the load as a history entry (rejected: the load is not an operation on the object).
+
+## 7k. Quotes around a localized replacement
+
+Models frequently answer a `<blank>` prompt with the replacement in quotes, sometimes followed by an explanation.
+
+- (a) If the answer opens with a quote whose closing mate is followed by nothing or by a line break, keep only the quoted span — unless the selection itself began with a quote, in which case the quotes belong to the content and are kept. **(default)**
+- (b) Insert the answer verbatim, quotes and trailing prose included.
+- (c) Always strip leading/trailing quotes (would corrupt a selection that is itself quoted, such as `“and what is the use of a book,”`).
+
+## 7l. Object-words whose object has changed or disappeared
+
+- (a) After every change to the object of interest, element object-words are re-rendered from the image on screen, so a thumbnail always shows the object as it is now; a reference whose element is gone is marked broken (dashed red outline plus a tooltip) and executing a prompt that uses it is refused with a message, rather than sending a stale id. **(default)**
+- (b) Leave the thumbnail as captured at drop time.
+
+## 7m. Reporting a failed request
+
+Errors are shown twice and stay until dismissed: a line under the prompt field where the user is looking, and a toast with a close button. An error with no message text falls back to a readable sentence, and starting a new prompt clears it. Previously the toast dismissed itself after seven seconds, which could pass unnoticed while the API library was still retrying.
+
 ## 8. Model parameters
 
 The paper names only the model. Temperature, max tokens and other parameters are left at the API defaults. Model name defaults to `gpt-3.5-turbo` and can be changed in Settings.

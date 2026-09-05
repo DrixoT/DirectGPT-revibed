@@ -121,6 +121,25 @@ export function elementThumb(svg: SVGSVGElement, el: SVGGraphicsElement): string
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x} ${y} ${w} ${h}" width="18" height="18" preserveAspectRatio="xMidYMid meet">${defs}${body}</svg>`;
 }
 
+/** The SVG currently rendered on screen, used to keep object-word thumbnails in sync. */
+export function liveSvgRoot(): SVGSVGElement | null {
+  const el = document.querySelector('.svg-host svg');
+  return el instanceof SVGSVGElement ? el : null;
+}
+
+/**
+ * Re-renders an element object-word against the image on screen. Returns the ref with a
+ * fresh thumbnail, or null when the element is gone (a reference broken by undo or an edit).
+ */
+export function refreshElementRef(ref: ElementRef): ElementRef | null {
+  const root = liveSvgRoot();
+  if (!root) return null;
+  const el = root.querySelector(`[id="${CSS.escape(ref.id)}"]`);
+  if (!(el instanceof SVGGraphicsElement)) return null;
+  const thumb = elementThumb(root, el);
+  return thumb === ref.thumb ? ref : { ...ref, thumb };
+}
+
 export function makeElementRef(svg: SVGSVGElement, el: SVGGraphicsElement): ElementRef {
   return { type: 'element', id: el.getAttribute('id') ?? '', thumb: elementThumb(svg, el), label: el.tagName.toLowerCase() };
 }

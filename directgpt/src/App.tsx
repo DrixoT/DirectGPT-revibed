@@ -19,10 +19,18 @@ import type { Sample } from './samples';
 import { loadSettings, saveSettings } from './settings';
 import { STUDY_ACTIVITIES } from './study';
 import type { StudyActivity } from './study';
-import { changedSvgIds, isRenderableSvg, normalizeSvg } from './svg';
+import { changedSvgIds, isRenderableSvg, normalizeSvg, parseSvg, refreshElementRef } from './svg';
 import { refLabel, sameRef } from './types';
 import type { ActiveTool, Content, ElementRef, LocationRef, ObjectRef, PromptPart, Range, Settings, TemplatePart, TextRef, Tool } from './types';
 import { useHistory } from './useHistory';
+
+/** A model or network failure always yields something the user can read. */
+function describeError(err: unknown): string {
+  const raw = err instanceof Error ? err.message : typeof err === 'string' ? err : '';
+  const text = raw.trim();
+  if (text) return text;
+  return 'The request to the model failed. Check the API key, the model name, and the network connection.';
+}
 
 interface Pending {
   targets: ObjectRef[];
@@ -99,11 +107,16 @@ export default function App() {
 
   const tool = activeTool ? tools.find((t) => t.id === activeTool.id) ?? null : null;
 
+
+  // Object-words keep showing the object they point at, even after undo or an edit changed it.
   useEffect(() => {
-    if (!error) return;
-    const t = setTimeout(() => setError(null), 7000);
-    return () => clearTimeout(t);
-  }, [error]);
+    promptRef.current?.refreshRefs(content);
+    setActiveTool((a) => {
+      if (!a || a.filled.length === 0) return a;
+      const filled = a.filled.map((r) => (r.type === 'element' ? refreshElementRef(r) ?? r : r));
+      return filled.some((r, i) => r !== a.filled[i]) ? { ...a, filled } : a;
+    });
+  }, [content]);
 
   const clearMarks = () => {
     setChangedText([]);
@@ -115,7 +128,8 @@ export default function App() {
       setChatSeed({ content: c, nonce: Date.now() });
       return;
     }
-    history.push(normalizeContent(c));
+    // Loading the starting content is not an operation on it: there is nothing to undo yet.
+    history.reset(normalizeContent(c));
     setSelection([]);
     clearMarks();
     setActiveTool(null);
@@ -275,6 +289,16 @@ export default function App() {
         return;
       }
     }
+    if (current?.kind === 'svg') {
+      const root = parseSvg(current.value);
+      const gone = [...parts, ...targets.map((t) => ({ type: 'object' as const, ref: t }))].some(
+        (p) => p.type === 'object' && p.ref.type === 'element' && !root?.querySelector(`[id="${CSS.escape(p.ref.id)}"]`),
+      );
+      if (gone) {
+        setError('A referenced element no longer exists in the image.');
+        return;
+      }
+    }
     if (!current) targets = [];
 
     const built = buildPrompts(current, parts, targets);
@@ -283,6 +307,7 @@ export default function App() {
     const p: Pending = { targets: [...targets, ...refs], abort, received: 0 };
     pendingRef.current = p;
     setPending(p);
+    setError(null);
     clearMarks();
     setPreview('');
     try {
@@ -297,7 +322,7 @@ export default function App() {
       let next: Content;
       if (built[0].apply === 'replace-target' && current) {
         const edits = built
-          .map((b, i) => ({ start: b.target!.start, end: b.target!.end, text: extractLocalized(responses[i]) }))
+          .map((b, i) => ({ start: b.target!.start, end: b.target!.end, text: extractLocalized(responses[i], b.target!.text) }))
           .sort((a, b) => a.start - b.start);
         let value = '';
         let cursor = 0;
@@ -330,7 +355,7 @@ export default function App() {
       addTool(parts);
       if (source === 'prompt') promptRef.current?.clear();
     } catch (err) {
-      if (!abort.signal.aborted) setError(err instanceof Error ? err.message : String(err));
+      if (!abort.signal.aborted) setError(describeError(err));
     } finally {
       pendingRef.current = null;
       setPending(null);
@@ -606,6 +631,7 @@ export default function App() {
               ref={promptRef}
               generating={!!pending}
               status={status}
+              error={error}
               selectionCount={selection.length}
               onSubmit={(parts) => void execute(parts, selection, 'prompt')}
               onStop={() => pendingRef.current?.abort.abort()}
@@ -657,7 +683,14 @@ export default function App() {
           onClose={() => setShowSettings(false)}
         />
       )}
-      {error && <div className="toast">{error}</div>}
+      {error && (
+        <div className="toast" role="alert">
+          <span>{error}</span>
+          <button type="button" onClick={() => setError(null)} title="Dismiss">
+            ✕
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -647,7 +647,14 @@ button.primary:disabled {
   margin-top: 8px;
 }
 
+.gen-status.is-error {
+  color: #b91c1c;
+  font-weight: 600;
+}
 .toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   position: fixed;
   bottom: 18px;
   left: 50%;
@@ -660,6 +667,15 @@ button.primary:disabled {
   z-index: 60;
   max-width: 80vw;
   font-size: 14px;
+}
+.toast button {
+  border: none;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 12px;
+  line-height: 1;
 }
 
 /* Chat baseline */
@@ -928,4 +944,8 @@ button.primary:disabled {
 }
 .baseline .chat {
   min-width: 0;
+}
+.chip.broken {
+  outline: 1px dashed #dc2626;
+  opacity: 0.65;
 }
