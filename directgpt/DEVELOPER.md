@@ -34,16 +34,20 @@ src/prism.ts               Prism setup + tokenizer flattening
 src/samples.ts             Study contents (§4.3) and their tasks
 src/settings.ts            localStorage settings (API key, model; default gpt-3.5-turbo)
 src/useHistory.ts          Linear undo/redo stack
+src/icons.tsx              The six icons exported from the Figma source, inlined
+src/glitch.ts              useGlitchIn(): the one-shot entry glitch on the brand marks
+src/components/Sidebar.tsx     Left column: wordmark, New, samples, study session, the Toolbar rail, Settings
+src/components/TopBar.tsx      Model pill, DirectGPT/ChatGPT-replica switch, API-key status
 src/components/TextView.tsx    Text/code representation: selection, marks, drag from selection
 src/components/SvgView.tsx     Rendered SVG: element/location selection, overlays, drag
-src/components/PromptField.tsx contenteditable prompt with object-word chips, drop targets, "Apply to N selected"
-src/components/Toolbar.tsx     Reusable prompts (tools) with "?" slots
+src/components/PromptField.tsx composer: contenteditable prompt with object-word chips, drop targets, "Apply to N selected", send
+src/components/Toolbar.tsx     Reusable prompts (tools) with "?" slots; rendered as a section of the sidebar
 src/components/EmptyState.tsx  Paste content or pick a sample
 src/components/Settings.tsx    API key / model dialog
 src/components/ChatView.tsx    ChatGPT replica (baseline of §4)
 src/study.ts                   Study activities: four tasks per content, with yellow highlights or a target image (§4.2-4.3)
 src/components/StudyPanel.tsx  Task panel (instruction, target, 3-min countdown), closeness rating, session summary
-src/styles.css
+src/styles.css             Design tokens and every surface (see ../design/THEME.md)
 ```
 
 ## Core model

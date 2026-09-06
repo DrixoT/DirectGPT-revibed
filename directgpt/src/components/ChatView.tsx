@@ -1,6 +1,8 @@
 import { marked } from 'marked';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type React from 'react';
+import { useGlitchIn } from '../glitch';
+import { IconSend, IconStop } from '../icons';
 import { streamChat } from '../openai';
 import type { ChatMessage } from '../openai';
 import Prism from '../prism';
@@ -47,6 +49,16 @@ function renderMarkdown(md: string): string {
     }
   });
   return doc.body.innerHTML;
+}
+
+/** The assistant mark, glitching once as the turn arrives and then resolving. */
+function Avatar() {
+  const glitch = useGlitchIn();
+  return (
+    <div className={`avatar-d ${glitch}`} data-text="D" aria-hidden="true">
+      D
+    </div>
+  );
 }
 
 export default function ChatView({ settings, onNeedKey, onError, seed }: Props) {
@@ -102,29 +114,43 @@ export default function ChatView({ settings, onNeedKey, onError, seed }: Props) 
   return (
     <div className="chat">
       <div className="chat-list" ref={listRef}>
-        {messages.length === 0 && <div className="chat-empty">Baseline conversational interface (ChatGPT replica used in the study). Load a sample from the header or start a conversation.</div>}
-        {messages.map((m, i) => (
-          <div key={i} className={`chat-msg ${m.role}`}>
-            <div className="chat-role">{m.role === 'user' ? 'You' : 'ChatGPT'}</div>
-            {m.role === 'assistant' ? (
-              <div className="chat-body markdown" dangerouslySetInnerHTML={{ __html: renderMarkdown(m.content) }} />
+        <div className="chat-thread">
+          {messages.length === 0 && <div className="chat-empty">Baseline conversational interface (ChatGPT replica used in the study). Load a sample from the sidebar or start a conversation.</div>}
+          {messages.map((m, i) => (
+            <div key={i} className={`chat-msg ${m.role}`}>
+              <div className="chat-role">{m.role === 'user' ? 'You' : 'ChatGPT'}</div>
+              {m.role === 'assistant' ? (
+                <>
+                  <Avatar />
+                  <div className="chat-body markdown">
+                    <span dangerouslySetInnerHTML={{ __html: renderMarkdown(m.content) }} />
+                    {generating && i === messages.length - 1 && <span className="chat-caret">▍</span>}
+                  </div>
+                </>
+              ) : (
+                <div className="chat-body">{m.content}</div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="chat-composer">
+        <div className="composer">
+          <textarea value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={onKeyDown} placeholder="Send a message." rows={2} />
+          <div className="composer-controls">
+            <div className="composer-left" />
+            {generating ? (
+              <button type="button" className="send stop" onClick={() => abortRef.current?.abort()} title="Stop">
+                <IconStop />
+              </button>
             ) : (
-              <div className="chat-body">{m.content}</div>
+              <button type="button" className="send" onClick={() => void send()} disabled={!input.trim()} title="Send (Enter)">
+                <IconSend />
+              </button>
             )}
           </div>
-        ))}
-      </div>
-      <div className="chat-input">
-        <textarea value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={onKeyDown} placeholder="Send a message." rows={2} />
-        {generating ? (
-          <button type="button" onClick={() => abortRef.current?.abort()}>
-            Stop
-          </button>
-        ) : (
-          <button type="button" className="primary" onClick={() => void send()} disabled={!input.trim()}>
-            Send
-          </button>
-        )}
+        </div>
+        <p className="chat-disclaimer">The model may produce inaccurate information. Always verify critical outputs.</p>
       </div>
     </div>
   );

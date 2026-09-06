@@ -21,7 +21,7 @@ First thing to do: click **Settings** (top right), paste an OpenAI API key, and 
 
 ### 1. Get an object of interest
 
-Either type a prompt in the field at the bottom (e.g. *draw a flower with 6 petals*, *write a haiku about rain*, *write a JS function that prints a pyramid*), or paste text / code / SVG markup into the empty panel and click **Use this content**, or pick one of the study samples (Alice, Frankenstein, two JavaScript functions, the flower and the smiley) from **Load study sample**.
+Either type a prompt in the field at the bottom (e.g. *draw a flower with 6 petals*, *write a haiku about rain*, *write a JS function that prints a pyramid*), or paste text / code / SVG markup into the empty panel and click **Use this content**, or pick one of the study samples (Alice, Frankenstein, two JavaScript functions, the flower and the smiley) from **Load study sample** in the sidebar.
 
 The result is shown in the central panel and stays there: text as prose, code with syntax highlighting, SVG rendered as an image. Every later operation updates this same panel and highlights what changed (bold words in text/code, a fading outline on changed SVG elements).
 
@@ -63,11 +63,11 @@ While a prompt runs, selected and referred objects pulse (for a prompt targeting
 
 ## ChatGPT replica
 
-The header switch **ChatGPT replica** shows the conversational baseline used in the paper's study: streamed answers, Markdown rendering with code highlighting, SVGs rendered inline, and the same content samples loadable as the first message of the conversation. It uses the same API key and model.
+The top-bar switch **ChatGPT replica** shows the conversational baseline used in the paper's study: streamed answers, Markdown rendering with code highlighting, SVGs rendered inline, and the same content samples loadable as the first message of the conversation. It uses the same API key and model.
 
 ## Study mode
 
-**Study session** in the header runs one activity from the paper's user study (Text A/B, Code A/B, Image A/B), each with its four tasks. A task panel on the left shows, at all times: the activity, the task number, a three-minute countdown, a short instruction (*Text in yellow => synonyms*, *Reproduce (add elements)*), and the target — the starting content with the parts to edit in yellow, or the target image. The panel is inert: its text cannot be selected or dragged into the prompt.
+**Study session** in the sidebar runs one activity from the paper's user study (Text A/B, Code A/B, Image A/B), each with its four tasks. A task panel on the left shows, at all times: the activity, the task number, a three-minute countdown, a short instruction (*Text in yellow => synonyms*, *Reproduce (add elements)*), and the target — the starting content with the parts to edit in yellow, or the target image. The panel is inert: its text cannot be selected or dragged into the prompt.
 
 The task's starting content is loaded automatically and reset for every task. Press **Task done**, or let the three minutes run out, and a 5-point *How close are you to the target?* (distant → close) rating is asked before the next task; a summary of times and ratings closes the activity. Study mode works with both the DirectGPT and the ChatGPT-replica interface, as in the paper.
 

@@ -1,6 +1,7 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import type React from 'react';
 import { chipInnerHTML, createChipElement, refFromChip } from '../chip';
+import { IconSend, IconStop } from '../icons';
 import { refreshElementRef } from '../svg';
 import { refLabel } from '../types';
 import type { Content, ObjectRef, PromptPart } from '../types';
@@ -437,7 +438,7 @@ const PromptField = forwardRef<PromptFieldHandle, Props>(function PromptField(
 
   return (
     <div className="prompt-area">
-      <div className={`prompt-box ${indicator ? 'drop-hover' : ''}`} ref={wrapper}>
+      <div className={`composer ${indicator ? 'drop-hover' : ''}`} ref={wrapper}>
         <div
           className="prompt-editor"
           ref={editor}
@@ -461,32 +462,34 @@ const PromptField = forwardRef<PromptFieldHandle, Props>(function PromptField(
             style={{ left: indicator.left, top: indicator.top, width: indicator.width, height: indicator.height }}
           />
         )}
-        {generating ? (
-          <button className="send stop" onClick={onStop} title="Stop generation" type="button">
-            <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
-              <rect x="3" y="3" width="10" height="10" rx="1.5" fill="currentColor" />
-            </svg>
-          </button>
-        ) : (
-          <button className="send" onClick={submit} disabled={empty} title="Execute prompt (Enter)" type="button">
-            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-              <path d="M3 11.5 21 3l-8.5 18-2.5-7.5L3 11.5z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-            </svg>
-          </button>
-        )}
+        {/* The design's control row: the chips it carries have no counterpart
+            here, so the row holds the localization badge and the send button. */}
+        <div className="composer-controls">
+          <div className="composer-left">
+            {selectionCount > 0 && (
+              <div className="apply-chip">
+                <button type="button" onClick={onClearSelection} title="Clear selection (Esc)">
+                  ✕
+                </button>
+                <span>
+                  | Apply to {selectionCount} selected element{selectionCount > 1 ? 's' : ''}
+                </span>
+              </div>
+            )}
+          </div>
+          {generating ? (
+            <button className="send stop" onClick={onStop} title="Stop generation" type="button">
+              <IconStop />
+            </button>
+          ) : (
+            <button className="send" onClick={submit} disabled={empty} title="Execute prompt (Enter)" type="button">
+              <IconSend />
+            </button>
+          )}
+        </div>
       </div>
       <div className="prompt-status">
         {error ? <div className="gen-status is-error">{error}</div> : <div className="gen-status">{status ?? ''}</div>}
-        {selectionCount > 0 && (
-          <div className="apply-chip">
-            <button type="button" onClick={onClearSelection} title="Clear selection (Esc)">
-              ✕
-            </button>
-            <span>
-              | Apply to {selectionCount} selected element{selectionCount > 1 ? 's' : ''}
-            </span>
-          </div>
-        )}
       </div>
     </div>
   );

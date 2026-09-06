@@ -23,6 +23,11 @@ Revibeability is `(2·|full| + 1·|partial| + 0·|fail|) / (2·|all|)` over a
 | Aided 1 | v2 | 64 | 4 | 0 | **0.971** |
 | **Aided 2** | **v3** | **67** | **1** | **0** | **0.993** |
 | Post-design | v3d | 68 | 0 | 0 | **1.000** |
+| Post-theme | v3e | — | — | — | *not graded* |
+
+`v3e` is the orange/black theme pass (`../design/THEME.md`). No fresh-grader
+round was run against it — see §6 for what was verified instead, and why the
+number is left blank rather than carried forward.
 
 **The headline revibeability of this artifact is 0.993** (aided round 2). That
 is the number the protocol reports, and it describes the paper-faithful build
@@ -261,7 +266,33 @@ used `apple-design`, which `DESIGN-PASS.md` names for gesture- and motion-heavy
 systems. No design canvas was drafted or reconciled with a user first, so step 3
 of that procedure was skipped.
 
-## 6. The design pass
+**A second design pass, ungraded.** The artifact carries a further theme pass
+(v3e) that the protocol does not provide for: the shell was rebuilt from a Figma
+source rather than restyled (`../design/THEME.md`). Two consequences worth
+stating plainly:
+
+- Unlike the first pass, it is **not CSS-only**, so "no line of markup changed"
+  is no longer the guarantee that behaviour is frozen. What backs that claim now
+  is a driven-browser run — 34 behavioural checks over the paper's mechanisms
+  and 25 assertions against the rubric tests whose surfaces moved (TEST-G01,
+  G03, G06, INT04, EC01, EC12, TB07, TB08, S03), all passing.
+- **No fresh-grader round was run against v3e.** A legitimate round needs an
+  agent that has not read `src/`, and the builder of this pass had. The headline
+  number the protocol reports is therefore unchanged at **0.993**, and the
+  1.000 belongs to v3d. Anyone wanting a score for v3e should run the round.
+
+**A pre-existing defect found while verifying, and left alone.** After a word is
+dragged out of the panel and dropped in the prompt, the next click inside the
+panel is swallowed: `TextView`'s `draggingOut` flag is only cleared by a later
+`mouseup` *inside* the view, and the drag ends over the prompt field. It
+reproduces identically at the v3d commit, so it is not a regression, and fixing
+it would be a behaviour change outside a design pass — it is recorded here
+rather than patched. No rubric test exercises a click immediately after a drag,
+which is why four graded rounds did not surface it.
+
+## 6. The design passes
+
+### Round 1 — the grey utility pass (v3d)
 
 Run after aided round 2, per protocol. Before/after screenshots are in
 `../design/before/` and `../design/after/`; the surface inventory and frozen list
@@ -296,6 +327,47 @@ break drag feedback. And the first attempt gave the DirectGPT/ChatGPT-replica
 switch a raised white pill for the active mode, which made the current mode
 genuinely unreadable; it was reverted to a solid accent fill before grading.
 
+### Round 2 — the orange/black theme pass (v3e)
+
+Not part of the protocol. The first pass had deliberately frozen layout and
+opened only colour, type and states, and the result read as a competent grey
+utility. This pass adopts a real interface — a Figma frame
+(`zBlbjH4oVh3xD6TifUjzHj`, `2:2`), a dark chat client with a 256px sidebar and a
+centred 768px column — recoloured from teal to orange on black, and extends it
+to cover the DirectGPT half of the app, which a chat design has no vocabulary
+for. `../design/THEME.md` records the whole pass.
+
+**It was not CSS-only.** `.header` was dismantled into a `Sidebar` and a
+`TopBar`; the Toolbar became a pinned section of that sidebar rather than its
+own column; `PromptField` took the design's composer shell; `ChatView` went
+close to 1:1 with the design. Everything under `src/` outside the shell —
+`TextView`, `SvgView`, `StudyPanel`, `Settings`, `EmptyState`, and every
+non-component module — is byte-identical.
+
+**No figure-pinned placement was traded.** TEST-G01's four placements survive,
+and each was re-measured in a driven browser after the rebuild: Undo top-left
+and Redo top-right above the content, the prompt below it, and the Toolbar to
+the left — hosted inside the design's own left sidebar, and pinned above the
+sidebar footer so the region stays visible however long the sample and activity
+lists grow. Placing it at the end of the scrolling column, as the first draft
+did, pushed it below the fold; that would have been the one placement this pass
+cost, and it was fixed rather than paid for.
+
+**Contrast is a departure from the source, on purpose.** The Figma greys are
+well below AA (`#3a3a3a` on `#111` is ~1.6:1). The design's hues are kept and
+only the luminance of secondary ink is lifted, to `--ink-2 #a8a29e` (7.49:1) and
+`--ink-3 #8b837d` (5.07:1). Every token pair carrying text was checked
+numerically on both grounds. Hairlines stay at the design's values and below
+3:1; they separate regions rather than bound components, and the
+`prefers-contrast: more` block lifts them.
+
+**Motion stays subordinate to meaning.** The wordmark and the assistant avatar
+glitch once on entry over 600ms and resolve, re-firing on hover and focus, and
+never looping — because the pulse that says which object a prompt is acting on
+(§3.2.4) is a graded signal and ambient motion would compete with it. Under
+`prefers-reduced-motion` the glitch becomes a static 1px chromatic split and the
+pulse survives, slowed, exactly as in round 1.
+
 ## 7. What this baseline must not be used to claim
 
 - **Not "DirectGPT beats ChatGPT".** The ChatGPT replica's system prompt is
@@ -307,7 +379,11 @@ genuinely unreadable; it was reverted to a solid accent fill before grading.
 - **Not "the implementation is defect-free".** 1.000 was scored against a
   deterministic mock that answers cooperatively. Seven verdicts rest on request
   inspection rather than model output, and two error paths could not be induced
-  at all (§5).
+  at all (§5). A defect no round caught is recorded in §5: after a drag out of
+  the content panel, the next click inside it is swallowed.
+- **Not a score for what the app looks like now.** Every number here was graded
+  against v3 or v3d. The artifact in this tree is v3e, the theme pass (§6), and
+  it has not been through a fresh-grader round.
 - **Not a claim about model quality.** Every judgement here is about interface
   behaviour — what was sent, what was replaced, what was highlighted. The rubric
   deliberately never grades the model's creativity.

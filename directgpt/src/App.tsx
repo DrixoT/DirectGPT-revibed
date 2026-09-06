@@ -5,11 +5,12 @@ import EmptyState from './components/EmptyState';
 import PromptField from './components/PromptField';
 import type { PromptFieldHandle } from './components/PromptField';
 import SettingsDialog from './components/Settings';
+import Sidebar from './components/Sidebar';
 import StudyPanel, { RatingDialog, StudySummary } from './components/StudyPanel';
 import type { StudyResult } from './components/StudyPanel';
 import SvgView from './components/SvgView';
 import TextView from './components/TextView';
-import Toolbar from './components/Toolbar';
+import TopBar from './components/TopBar';
 import { extractLocalized, extractObject } from './extract';
 import { changedRanges } from './diff';
 import { streamChat } from './openai';
@@ -17,7 +18,6 @@ import { buildPrompts, plainPromptText } from './prompts';
 import { SAMPLES } from './samples';
 import type { Sample } from './samples';
 import { loadSettings, saveSettings } from './settings';
-import { STUDY_ACTIVITIES } from './study';
 import type { StudyActivity } from './study';
 import { changedSvgIds, isRenderableSvg, normalizeSvg, parseSvg, refreshElementRef } from './svg';
 import { refLabel, sameRef } from './types';
@@ -95,14 +95,12 @@ export default function App() {
   const [cursor, setCursor] = useState<{ x: number; y: number } | null>(null);
   const [preview, setPreview] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [samplesOpen, setSamplesOpen] = useState(false);
   const [activeSample, setActiveSample] = useState<Sample | null>(null);
   const [chatSeed, setChatSeed] = useState<{ content: Content; nonce: number } | null>(null);
   const [study, setStudy] = useState<{ activity: StudyActivity; index: number; startedAt: number } | null>(null);
   const [rating, setRating] = useState<{ timedOut: boolean; seconds: number } | null>(null);
   const [studyResults, setStudyResults] = useState<StudyResult[]>([]);
   const [studySummary, setStudySummary] = useState<StudyResult[] | null>(null);
-  const [studyMenuOpen, setStudyMenuOpen] = useState(false);
   const promptRef = useRef<PromptFieldHandle>(null);
 
   const tool = activeTool ? tools.find((t) => t.id === activeTool.id) ?? null : null;
@@ -477,183 +475,131 @@ export default function App() {
     });
   };
 
-  const groups: Array<Sample['group']> = ['Text', 'Code', 'Image'];
-
   return (
     <div className="app">
-      <header className="header">
-        <h1>DirectGPT</h1>
-        <div className="mode-switch">
-          <button type="button" className={mode === 'direct' ? 'on' : ''} onClick={() => setMode('direct')}>
-            DirectGPT
-          </button>
-          <button type="button" className={mode === 'chat' ? 'on' : ''} onClick={() => setMode('chat')}>
-            ChatGPT replica
-          </button>
-        </div>
-        <div className="menu">
-          <button type="button" className="menu-trigger" onClick={() => setSamplesOpen((o) => !o)}>
-            Load study sample ▾
-          </button>
-          {samplesOpen && (
-            <div className="menu-list" onMouseLeave={() => setSamplesOpen(false)}>
-              {groups.map((g) => (
-                <div key={g}>
-                  <div className="group">{g}</div>
-                  {SAMPLES.filter((s) => s.group === g).map((s) => (
-                    <button
-                      key={s.id}
-                      type="button"
-                      onClick={() => {
-                        setSamplesOpen(false);
-                        setActiveSample(s);
-                        loadContent(s.content);
-                      }}
-                    >
-                      {s.name}
-                    </button>
-                  ))}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-        <div className="menu">
-          <button type="button" className="menu-trigger" onClick={() => setStudyMenuOpen((o) => !o)}>
-            {study ? 'Study running' : 'Study session'} ▾
-          </button>
-          {studyMenuOpen && (
-            <div className="menu-list" onMouseLeave={() => setStudyMenuOpen(false)}>
-              <div className="group">Start an activity (4 tasks, 3 min each)</div>
-              {STUDY_ACTIVITIES.map((a) => (
-                <button
-                  key={a.id}
-                  type="button"
-                  onClick={() => {
-                    setStudyMenuOpen(false);
-                    setStudyResults([]);
-                    startTask(a, 0);
-                  }}
-                >
-                  {a.name}
-                </button>
-              ))}
-              {study && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setStudyMenuOpen(false);
-                    quitStudy();
-                  }}
-                >
-                  Leave the current session
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-        {mode === 'direct' && !study && (
-          <button type="button" onClick={newDocument} title="Clear the content and the toolbar">
-            New
-          </button>
-        )}
-        <div className="spacer" />
-        {!settings.apiKey && <span className="key-warning">No API key set</span>}
-        <button type="button" onClick={() => setShowSettings(true)}>
-          Settings
-        </button>
-      </header>
+      <Sidebar
+        mode={mode}
+        hasKey={!!settings.apiKey}
+        activeSample={activeSample}
+        studyRunning={!!study}
+        canNew={mode === 'direct' && !study}
+        tools={tools}
+        activeTool={activeTool}
+        onNew={newDocument}
+        onLoadSample={(s) => {
+          setActiveSample(s);
+          loadContent(s.content);
+        }}
+        onStartActivity={(a) => {
+          setStudyResults([]);
+          startTask(a, 0);
+        }}
+        onQuitStudy={quitStudy}
+        onOpenSettings={() => setShowSettings(true)}
+        onClickTool={handleToolClick}
+        onRemoveTool={(id) => setTools((ts) => ts.filter((t) => t.id !== id))}
+        onHoverRef={setHoverRef}
+      />
 
-      {mode === 'direct' ? (
-        <div className={`direct ${study ? 'with-study' : ''}`}>
-          {study && (
-            <StudyPanel
-              activity={study.activity}
-              taskIndex={study.index}
-              startedAt={study.startedAt}
-              onFinishTask={finishTask}
-              onQuit={quitStudy}
-            />
-          )}
-          <Toolbar tools={tools} active={activeTool} onClickTool={handleToolClick} onRemoveTool={(id) => setTools((ts) => ts.filter((t) => t.id !== id))} onHoverRef={setHoverRef} />
-          <main className="workspace">
-            <div className="history-bar">
-              <button type="button" onClick={undo} disabled={!history.canUndo || !!pending} title="Undo (Ctrl/Cmd+Z)">
-                ↶ Undo
-              </button>
-              <button type="button" onClick={redo} disabled={!history.canRedo || !!pending} title="Redo (Ctrl/Cmd+Shift+Z)">
-                ↷ Redo
-              </button>
-            </div>
-            <div className={`object-panel ${pending ? 'busy' : ''} ${tool ? 'tool-mode' : ''} ${pending && pulse.length === 0 ? 'working' : ''}`}>
-              {content ? (
-                content.kind === 'svg' ? (
-                  <SvgView
-                    value={content.value}
-                    selection={selection}
-                    pulse={pulse}
-                    changed={changedSvg}
-                    hover={hoverRef}
-                    slotRefs={slotRefs}
-                    onSelectionComplete={(refs: Array<ElementRef | LocationRef>, additive) => handleSelectionComplete(refs, additive)}
-                    onDragStart={(refs, ev) => startDrag(refs, ev)}
-                  />
-                ) : (
-                  <TextView
-                    value={content.value}
-                    language={content.kind === 'code' ? content.language ?? 'javascript' : null}
-                    selection={selection.filter((s): s is TextRef => s.type === 'text')}
-                    pulse={pulse}
-                    changed={changedText}
-                    hover={hoverRef}
-                    slotRefs={slotRefs}
-                    onSelectionComplete={(refs, additive) => handleSelectionComplete(refs, additive)}
-                    onDragStart={(refs, ev) => startDrag(refs, ev)}
-                  />
-                )
-              ) : preview ? (
-                <pre className="preview">{preview}</pre>
-              ) : (
-                <EmptyState
-                  onLoad={(c) => {
-                    setActiveSample(SAMPLES.find((s) => s.content === c) ?? null);
-                    loadContent(c);
-                  }}
-                />
-              )}
-            </div>
-            {activeSample && content && !study && (
-              <div className="tasks-hint">
-                <b>Study tasks for this sample:</b> {activeSample.tasks.join(' · ')}
-              </div>
+      <div className="app-main">
+        <TopBar
+          model={settings.model}
+          mode={mode}
+          hasKey={!!settings.apiKey}
+          onSetMode={setMode}
+          onOpenSettings={() => setShowSettings(true)}
+        />
+
+        {mode === 'direct' ? (
+          <div className={`direct ${study ? 'with-study' : ''}`}>
+            {study && (
+              <StudyPanel
+                activity={study.activity}
+                taskIndex={study.index}
+                startedAt={study.startedAt}
+                onFinishTask={finishTask}
+                onQuit={quitStudy}
+              />
             )}
-            <PromptField
-              ref={promptRef}
-              generating={!!pending}
-              status={status}
-              error={error}
-              selectionCount={selection.length}
-              onSubmit={(parts) => void execute(parts, selection, 'prompt')}
-              onStop={() => pendingRef.current?.abort.abort()}
-              onClearSelection={() => setSelection([])}
-              onHoverRef={setHoverRef}
-            />
-          </main>
-        </div>
-      ) : (
-        <div className={`baseline ${study ? 'with-study' : ''}`}>
-          {study && (
-            <StudyPanel
-              activity={study.activity}
-              taskIndex={study.index}
-              startedAt={study.startedAt}
-              onFinishTask={finishTask}
-              onQuit={quitStudy}
-            />
-          )}
-          <ChatView settings={settings} onNeedKey={() => setShowSettings(true)} onError={setError} seed={chatSeed} />
-        </div>
-      )}
+            <main className="workspace">
+              <div className="history-bar">
+                <button type="button" onClick={undo} disabled={!history.canUndo || !!pending} title="Undo (Ctrl/Cmd+Z)">
+                  ↶ Undo
+                </button>
+                <button type="button" onClick={redo} disabled={!history.canRedo || !!pending} title="Redo (Ctrl/Cmd+Shift+Z)">
+                  ↷ Redo
+                </button>
+              </div>
+              <div className={`object-panel ${pending ? 'busy' : ''} ${tool ? 'tool-mode' : ''} ${pending && pulse.length === 0 ? 'working' : ''}`}>
+                {content ? (
+                  content.kind === 'svg' ? (
+                    <SvgView
+                      value={content.value}
+                      selection={selection}
+                      pulse={pulse}
+                      changed={changedSvg}
+                      hover={hoverRef}
+                      slotRefs={slotRefs}
+                      onSelectionComplete={(refs: Array<ElementRef | LocationRef>, additive) => handleSelectionComplete(refs, additive)}
+                      onDragStart={(refs, ev) => startDrag(refs, ev)}
+                    />
+                  ) : (
+                    <TextView
+                      value={content.value}
+                      language={content.kind === 'code' ? content.language ?? 'javascript' : null}
+                      selection={selection.filter((s): s is TextRef => s.type === 'text')}
+                      pulse={pulse}
+                      changed={changedText}
+                      hover={hoverRef}
+                      slotRefs={slotRefs}
+                      onSelectionComplete={(refs, additive) => handleSelectionComplete(refs, additive)}
+                      onDragStart={(refs, ev) => startDrag(refs, ev)}
+                    />
+                  )
+                ) : preview ? (
+                  <pre className="preview">{preview}</pre>
+                ) : (
+                  <EmptyState
+                    onLoad={(c) => {
+                      setActiveSample(SAMPLES.find((s) => s.content === c) ?? null);
+                      loadContent(c);
+                    }}
+                  />
+                )}
+              </div>
+              {activeSample && content && !study && (
+                <div className="tasks-hint">
+                  <b>Study tasks for this sample:</b> {activeSample.tasks.join(' · ')}
+                </div>
+              )}
+              <PromptField
+                ref={promptRef}
+                generating={!!pending}
+                status={status}
+                error={error}
+                selectionCount={selection.length}
+                onSubmit={(parts) => void execute(parts, selection, 'prompt')}
+                onStop={() => pendingRef.current?.abort.abort()}
+                onClearSelection={() => setSelection([])}
+                onHoverRef={setHoverRef}
+              />
+            </main>
+          </div>
+        ) : (
+          <div className={`baseline ${study ? 'with-study' : ''}`}>
+            {study && (
+              <StudyPanel
+                activity={study.activity}
+                taskIndex={study.index}
+                startedAt={study.startedAt}
+                onFinishTask={finishTask}
+                onQuit={quitStudy}
+              />
+            )}
+            <ChatView settings={settings} onNeedKey={() => setShowSettings(true)} onError={setError} seed={chatSeed} />
+          </div>
+        )}
+      </div>
 
       {rating && <RatingDialog timedOut={rating.timedOut} onRate={recordRating} />}
       {studySummary && <StudySummary results={studySummary} onClose={() => setStudySummary(null)} />}
