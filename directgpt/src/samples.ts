@@ -52,20 +52,20 @@ const MOVING_WINDOW = `function countBelowMovingMean(values, windowSize) {
 }`;
 
 const FLOWER = `<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="150" cy="60" r="22" fill="black" />
-  <circle cx="176" cy="79" r="22" fill="black" />
-  <circle cx="166" cy="110" r="22" fill="black" />
-  <circle cx="134" cy="110" r="22" fill="black" />
-  <circle cx="124" cy="79" r="22" fill="black" />
-  <circle cx="150" cy="88" r="13" fill="white" />
+  <circle cx="150" cy="60" r="22" fill="#ff7a18" />
+  <circle cx="176" cy="79" r="22" fill="#ff7a18" />
+  <circle cx="166" cy="110" r="22" fill="#ff7a18" />
+  <circle cx="134" cy="110" r="22" fill="#ff7a18" />
+  <circle cx="124" cy="79" r="22" fill="#ff7a18" />
+  <circle cx="150" cy="88" r="13" fill="#faf8f5" />
 </svg>`;
 
 const SMILEY = `<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="150" cy="80" r="45" fill="orange" />
-  <circle cx="135" cy="68" r="5" fill="black" />
-  <circle cx="165" cy="68" r="5" fill="black" />
-  <circle cx="150" cy="84" r="4" fill="black" />
-  <line x1="130" y1="102" x2="170" y2="102" stroke="black" stroke-width="3" />
+  <circle cx="150" cy="80" r="45" fill="#ff7a18" />
+  <circle cx="135" cy="68" r="5" fill="#0d0700" />
+  <circle cx="165" cy="68" r="5" fill="#0d0700" />
+  <circle cx="150" cy="84" r="4" fill="#0d0700" />
+  <line x1="130" y1="102" x2="170" y2="102" stroke="#0d0700" stroke-width="3" />
 </svg>`;
 
 export const SAMPLES: Sample[] = [
