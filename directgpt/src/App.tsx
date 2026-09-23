@@ -98,6 +98,7 @@ export default function App() {
   const [activeSample, setActiveSample] = useState<Sample | null>(null);
   const [chatSeed, setChatSeed] = useState<{ content: Content; nonce: number } | null>(null);
   const [study, setStudy] = useState<{ activity: StudyActivity; index: number; startedAt: number } | null>(null);
+  const [studyW, setStudyW] = useState(480);
   const [rating, setRating] = useState<{ timedOut: boolean; seconds: number } | null>(null);
   const [studyResults, setStudyResults] = useState<StudyResult[]>([]);
   const [studySummary, setStudySummary] = useState<StudyResult[] | null>(null);
@@ -511,12 +512,14 @@ export default function App() {
         />
 
         {mode === 'direct' ? (
-          <div className={`direct ${study ? 'with-study' : ''}`}>
+          <div className={`direct ${study ? 'with-study' : ''}`} style={study ? { ['--study-w' as string]: `${studyW}px` } : undefined}>
             {study && (
               <StudyPanel
                 activity={study.activity}
                 taskIndex={study.index}
                 startedAt={study.startedAt}
+                width={studyW}
+                onResize={setStudyW}
                 onFinishTask={finishTask}
                 onQuit={quitStudy}
               />
@@ -586,12 +589,14 @@ export default function App() {
             </main>
           </div>
         ) : (
-          <div className={`baseline ${study ? 'with-study' : ''}`}>
+          <div className={`baseline ${study ? 'with-study' : ''}`} style={study ? { ['--study-w' as string]: `${studyW}px` } : undefined}>
             {study && (
               <StudyPanel
                 activity={study.activity}
                 taskIndex={study.index}
                 startedAt={study.startedAt}
+                width={studyW}
+                onResize={setStudyW}
                 onFinishTask={finishTask}
                 onQuit={quitStudy}
               />

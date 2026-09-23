@@ -2,6 +2,19 @@ import { useEffect, useState } from 'react';
 import { highlightSegments, TASK_TIME_LIMIT_S } from '../study';
 import type { StudyActivity } from '../study';
 
+const STUDY_MIN = 280;
+const WORKSPACE_MIN = 360;
+const STEP = 20;
+
+function clampStudyWidth(px: number, parentW: number): number {
+  const max = Math.max(STUDY_MIN, parentW - WORKSPACE_MIN);
+  return Math.min(max, Math.max(STUDY_MIN, Math.round(px)));
+}
+
+function parentWidth(el: HTMLElement): number {
+  return el.parentElement?.getBoundingClientRect().width ?? el.getBoundingClientRect().width;
+}
+
 export interface StudyResult {
   activity: string;
   task: number;
@@ -15,6 +28,8 @@ interface Props {
   activity: StudyActivity;
   taskIndex: number;
   startedAt: number;
+  width: number;
+  onResize: (px: number) => void;
   onFinishTask: (timedOut: boolean) => void;
   onQuit: () => void;
 }
@@ -30,7 +45,7 @@ function mmss(total: number): string {
  * image of the content to edit with the relevant parts in yellow, or the target image.
  * It stays visible for the whole task, and the task ends at the three-minute limit.
  */
-export default function StudyPanel({ activity, taskIndex, startedAt, onFinishTask, onQuit }: Props) {
+export default function StudyPanel({ activity, taskIndex, startedAt, width, onResize, onFinishTask, onQuit }: Props) {
   const task = activity.tasks[taskIndex];
   const [left, setLeft] = useState(TASK_TIME_LIMIT_S);
 
@@ -46,10 +61,53 @@ export default function StudyPanel({ activity, taskIndex, startedAt, onFinishTas
     return () => clearInterval(id);
   }, [startedAt, onFinishTask]);
 
+  const onPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    const panel = e.currentTarget.closest('.study-panel');
+    if (!(panel instanceof HTMLElement)) return;
+    const origin = panel.getBoundingClientRect().left;
+    const parentW = parentWidth(panel);
+    const move = (ev: PointerEvent) => onResize(clampStudyWidth(ev.clientX - origin, parentW));
+    const up = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    const panel = e.currentTarget.closest('.study-panel');
+    if (!(panel instanceof HTMLElement)) return;
+    const parentW = parentWidth(panel);
+    const current = panel.getBoundingClientRect().width;
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      onResize(clampStudyWidth(current - STEP, parentW));
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      onResize(clampStudyWidth(current + STEP, parentW));
+    }
+  };
+
   const segments = highlightSegments(activity.content.value, task.highlights);
 
   return (
     <aside className="study-panel" onDragStart={(e) => e.preventDefault()}>
+      <button
+        type="button"
+        className="study-resize"
+        role="separator"
+        aria-orientation="vertical"
+        aria-label="Resize study panel"
+        aria-valuenow={width}
+        aria-valuemin={STUDY_MIN}
+        onPointerDown={onPointerDown}
+        onKeyDown={onKeyDown}
+      />
       <div className="study-head">
         <span className="study-activity">{activity.name}</span>
         <button type="button" className="study-quit" onClick={onQuit} title="Leave the study session">

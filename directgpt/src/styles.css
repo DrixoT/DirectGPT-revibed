@@ -566,7 +566,7 @@ button:not(:disabled):active {
 }
 .direct.with-study,
 .baseline.with-study {
-  grid-template-columns: 260px 1fr;
+  grid-template-columns: var(--study-w, 480px) minmax(0, 1fr);
 }
 
 /* --- Toolbar rail: prompts kept as reusable tools (§3.2.3). It lives inside
@@ -1758,15 +1758,38 @@ button.primary:disabled {
    Study apparatus (§4): task panel, timer, rating
    ========================================================================== */
 .study-panel {
+  position: relative;
   border-right: 1px solid var(--line);
   background: var(--chrome);
   padding: var(--sp-4);
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
+  min-width: 0;
   min-height: 0;
   user-select: none;
   -webkit-user-select: none;
+}
+.study-resize {
+  position: absolute;
+  top: 0;
+  right: -3px;
+  width: 6px;
+  height: 100%;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  cursor: col-resize;
+  touch-action: none;
+  z-index: 2;
+}
+.study-resize:hover,
+.study-resize:focus-visible {
+  background: var(--accent);
+}
+.study-resize:active {
+  transform: none;
 }
 .study-head {
   display: flex;
@@ -1827,7 +1850,7 @@ button.primary:disabled {
   color: var(--paper-ink);
   border: 1px solid var(--line-strong);
   border-radius: var(--r-sm);
-  padding: var(--sp-2);
+  padding: var(--sp-4);
 }
 .study-target-image svg {
   max-width: 100%;
@@ -1837,14 +1860,13 @@ button.primary:disabled {
 .study-target-text {
   margin: 0;
   font-family: var(--font);
-  font-size: var(--fs-2xs);
-  line-height: 1.5;
+  font-size: var(--fs-md);
+  line-height: 1.7;
   white-space: pre-wrap;
-  word-break: break-word;
 }
 .study-target-text.is-code {
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: var(--fs-xs);
 }
 .study-target-text .mark {
   background: var(--highlight);
@@ -1902,12 +1924,6 @@ button.primary:disabled {
 /* ==========================================================================
    Responsive — down to a laptop viewport
    ========================================================================== */
-@media (max-width: 1100px) {
-  .direct.with-study,
-  .baseline.with-study {
-    grid-template-columns: 220px 1fr;
-  }
-}
 @media (min-width: 1400px) {
   .workspace {
     padding-left: var(--sp-6);
