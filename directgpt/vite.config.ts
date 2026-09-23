@@ -16,6 +16,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/google-ai/, ''),
       },
+      '/openrouter': {
+        target: 'https://openrouter.ai/api',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/openrouter/, ''),
+      },
     },
   },
 });

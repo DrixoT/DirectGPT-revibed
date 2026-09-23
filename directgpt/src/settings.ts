@@ -16,6 +16,7 @@ function emptySettings(): Settings {
     openaiApiKey: '',
     anthropicApiKey: '',
     googleApiKey: '',
+    openrouterApiKey: '',
     model: DEFAULT_MODEL,
     favorites: [],
   };
@@ -33,6 +34,7 @@ export function loadSettings(): Settings {
         openaiApiKey: asString(parsed.openaiApiKey) || asString(parsed.apiKey),
         anthropicApiKey: asString(parsed.anthropicApiKey),
         googleApiKey: asString(parsed.googleApiKey),
+        openrouterApiKey: asString(parsed.openrouterApiKey),
         model: asString(parsed.model) || DEFAULT_MODEL,
         favorites,
       };

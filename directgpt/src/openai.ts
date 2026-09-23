@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { keyForProvider, providerOf } from './models';
+import { keyForProvider, openrouterKey, providerOf, resolveOpenRouterModel, setOpenRouterModels, type ModelInfo } from './models';
 import type { Settings } from './types';
 
 export interface ChatMessage {
@@ -13,6 +13,12 @@ function anthropicBase(): string {
 
 function googleBase(): string {
   return import.meta.env.DEV ? '/google-ai' : 'https://generativelanguage.googleapis.com';
+}
+
+function openrouterBase(): string {
+  if (!import.meta.env.DEV) return 'https://openrouter.ai/api';
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5173';
+  return `${origin}/openrouter`;
 }
 
 async function errorFrom(res: Response): Promise<string> {
@@ -88,15 +94,81 @@ function mergeTurns(messages: ChatMessage[]): ChatMessage[] {
   return out;
 }
 
+type OpenRouterModel = {
+  id?: string;
+  name?: string;
+  architecture?: { output_modalities?: string[] };
+};
+
+let fetchedKey = '';
+let fetched: ModelInfo[] | null = null;
+let inflight: Promise<ModelInfo[]> | null = null;
+let inflightKey = '';
+
+export async function fetchOpenRouterModels(apiKey: string, signal?: AbortSignal): Promise<ModelInfo[]> {
+  const key = apiKey.trim();
+  if (!key) {
+    fetchedKey = '';
+    fetched = [];
+    inflight = null;
+    inflightKey = '';
+    setOpenRouterModels([]);
+    return [];
+  }
+  if (fetched && fetchedKey === key) return fetched;
+  if (inflight && inflightKey === key) return inflight;
+  if (fetchedKey !== key) setOpenRouterModels([]);
+  inflightKey = key;
+  inflight = (async () => {
+    const res = await fetch(`${openrouterBase()}/v1/models`, {
+      headers: {
+        Authorization: `Bearer ${key}`,
+        'X-Title': 'DirectGPT',
+      },
+      signal,
+    });
+    if (!res.ok) throw new Error(await errorFrom(res));
+    const json = (await res.json()) as { data?: OpenRouterModel[] };
+    const list: ModelInfo[] = [];
+    for (const m of json.data ?? []) {
+      if (!m.id) continue;
+      if (m.id.includes(':batch')) continue;
+      const out = m.architecture?.output_modalities;
+      if (out && !out.includes('text')) continue;
+      list.push({
+        id: m.id,
+        label: m.name || m.id,
+        provider: 'openrouter',
+        providerLabel: 'OpenRouter',
+      });
+    }
+    fetchedKey = key;
+    fetched = list;
+    setOpenRouterModels(list);
+    return list;
+  })();
+  try {
+    return await inflight;
+  } finally {
+    if (inflightKey === key) inflight = null;
+  }
+}
+
 async function streamOpenAI(
   settings: Settings,
   messages: ChatMessage[],
   signal: AbortSignal,
-  onDelta?: (delta: string, total: string) => void,
+  onDelta: ((delta: string, total: string) => void) | undefined,
+  opts: { openrouter: boolean; model: string },
 ): Promise<string> {
-  const client = new OpenAI({ apiKey: settings.openaiApiKey, dangerouslyAllowBrowser: true });
+  const client = new OpenAI({
+    apiKey: opts.openrouter ? openrouterKey(settings) : settings.openaiApiKey,
+    baseURL: opts.openrouter ? `${openrouterBase()}/v1` : undefined,
+    defaultHeaders: opts.openrouter ? { 'X-Title': 'DirectGPT' } : undefined,
+    dangerouslyAllowBrowser: true,
+  });
   const stream = await client.chat.completions.create(
-    { model: settings.model, messages, stream: true },
+    { model: opts.model, messages, stream: true },
     { signal },
   );
   let total = '';
@@ -205,7 +277,8 @@ async function streamGoogle(
 /**
  * Executes a prompt through the selected provider, streaming the answer so it
  * can be displayed word-by-word and stopped mid-way (§3.2.4).
- * OpenAI uses the official SDK (`dangerouslyAllowBrowser`). Anthropic and Google
+ * OpenAI uses the official SDK (`dangerouslyAllowBrowser`). OpenRouter uses the
+ * same SDK against its OpenAI-compatible base URL. Anthropic and Google
  * are fetched from the Vite proxy in development.
  */
 export async function streamChat(
@@ -215,8 +288,15 @@ export async function streamChat(
   onDelta?: (delta: string, total: string) => void,
 ): Promise<string> {
   const provider = providerOf(settings.model);
-  if (!keyForProvider(settings, provider).trim()) throw new Error('No API key set for this model.');
-  if (provider === 'anthropic') return streamAnthropic(settings, messages, signal, onDelta);
-  if (provider === 'google') return streamGoogle(settings, messages, signal, onDelta);
-  return streamOpenAI(settings, messages, signal, onDelta);
+  const native = keyForProvider(settings, provider).trim();
+  const or = openrouterKey(settings);
+  if (!native && !or) throw new Error('No API key set for this model.');
+  if (native && provider === 'anthropic') return streamAnthropic(settings, messages, signal, onDelta);
+  if (native && provider === 'google') return streamGoogle(settings, messages, signal, onDelta);
+  if (native && provider === 'openai') return streamOpenAI(settings, messages, signal, onDelta, { openrouter: false, model: settings.model });
+  const model = resolveOpenRouterModel(settings.model);
+  if (!model.includes('/')) {
+    throw new Error('This model is not available on OpenRouter. Open the model picker and choose an OpenRouter model.');
+  }
+  return streamOpenAI(settings, messages, signal, onDelta, { openrouter: true, model });
 }

@@ -146,3 +146,15 @@ export function IconGoogle({ className }: IconProps) {
     </svg>
   );
 }
+
+/** Not in the Figma source: OpenRouter rail mark. */
+export function IconOpenRouter({ className }: IconProps) {
+  return (
+    <svg className={className} width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M12 2.2l8.5 4.9v9.8L12 21.8 3.5 16.9V7.1L12 2.2zm0 2.6L5.5 8.6v6.8L12 19.2l6.5-3.8V8.6L12 4.8z"
+      />
+    </svg>
+  );
+}

@@ -566,6 +566,9 @@ button:not(:disabled):active {
 .model-picker-rail .prov.google {
   color: #8ab4f8;
 }
+.model-picker-rail .prov.openrouter {
+  color: #ff9f6b;
+}
 .model-picker-main {
   flex: 1;
   min-width: 0;
@@ -657,6 +660,9 @@ button:not(:disabled):active {
 }
 .model-row-mark.google {
   color: #8ab4f8;
+}
+.model-row-mark.openrouter {
+  color: #ff9f6b;
 }
 .model-row-text {
   display: flex;

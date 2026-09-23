@@ -13,13 +13,22 @@ export default function SettingsDialog({ settings, onSave, onClose, focusProvide
   const [openaiApiKey, setOpenaiApiKey] = useState(settings.openaiApiKey);
   const [anthropicApiKey, setAnthropicApiKey] = useState(settings.anthropicApiKey);
   const [googleApiKey, setGoogleApiKey] = useState(settings.googleApiKey);
+  const [openrouterApiKey, setOpenrouterApiKey] = useState(settings.openrouterApiKey);
   const openaiRef = useRef<HTMLInputElement>(null);
   const anthropicRef = useRef<HTMLInputElement>(null);
   const googleRef = useRef<HTMLInputElement>(null);
+  const openrouterRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const p = focusProvider ?? providerOf(settings.model);
-    const el = p === 'anthropic' ? anthropicRef.current : p === 'google' ? googleRef.current : openaiRef.current;
+    const el =
+      p === 'anthropic'
+        ? anthropicRef.current
+        : p === 'google'
+          ? googleRef.current
+          : p === 'openrouter'
+            ? openrouterRef.current
+            : openaiRef.current;
     el?.focus();
   }, [focusProvider, settings.model]);
 
@@ -57,6 +66,16 @@ export default function SettingsDialog({ settings, onSave, onClose, focusProvide
             placeholder="AIza..."
           />
         </label>
+        <label>
+          OpenRouter API key
+          <input
+            ref={openrouterRef}
+            type="password"
+            value={openrouterApiKey}
+            onChange={(e) => setOpenrouterApiKey(e.target.value)}
+            placeholder="sk-or-..."
+          />
+        </label>
         <div className="modal-actions">
           <button type="button" onClick={onClose}>
             Cancel
@@ -69,6 +88,7 @@ export default function SettingsDialog({ settings, onSave, onClose, focusProvide
                 openaiApiKey: openaiApiKey.trim(),
                 anthropicApiKey: anthropicApiKey.trim(),
                 googleApiKey: googleApiKey.trim(),
+                openrouterApiKey: openrouterApiKey.trim(),
                 model: settings.model,
                 favorites: settings.favorites,
               });

@@ -62,6 +62,7 @@ export interface Settings {
   openaiApiKey: string;
   anthropicApiKey: string;
   googleApiKey: string;
+  openrouterApiKey: string;
   model: string;
   favorites: string[];
 }
