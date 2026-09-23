@@ -81,3 +81,15 @@ export function refLabel(ref: ObjectRef): string {
       return `(${ref.x}, ${ref.y})`;
   }
 }
+
+/** Cursor-style selector: `circle#c0`, `(x, y)`, or the selected text. */
+export function refIdent(ref: ObjectRef): string {
+  switch (ref.type) {
+    case 'element':
+      return ref.id ? `${ref.label}#${ref.id}` : ref.label;
+    case 'location':
+      return `(${ref.x}, ${ref.y})`;
+    case 'text':
+      return ref.text.length > 24 ? `${ref.text.slice(0, 23)}…` : ref.text;
+  }
+}

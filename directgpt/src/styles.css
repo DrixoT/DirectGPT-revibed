@@ -888,6 +888,21 @@ button:not(:disabled):active {
   border-style: solid;
   background: rgba(255, 122, 24, 0.2);
 }
+.svg-overlay .box-id {
+  position: absolute;
+  left: 0;
+  bottom: 100%;
+  margin-bottom: 2px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 14px;
+  padding: 0 5px;
+  border-radius: 2px 2px 2px 0;
+  white-space: nowrap;
+}
 .dgpt-pulse {
   animation: dgpt-pulse-el 1.1s ease-in-out infinite;
 }
@@ -1149,6 +1164,11 @@ button:not(:disabled):active {
 }
 .apply-chip button:hover {
   color: var(--ink);
+}
+.apply-chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 36ch;
 }
 
 /* ==========================================================================

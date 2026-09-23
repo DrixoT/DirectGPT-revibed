@@ -2,7 +2,7 @@ import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import type React from 'react';
 import { beginPotentialDrag } from '../dnd';
 import { clientToSvg, isSelectableSvgElement, makeElementRef, svgToClient } from '../svg';
-import { sameRef } from '../types';
+import { refIdent, sameRef } from '../types';
 import type { ElementRef, LocationRef, ObjectRef } from '../types';
 
 interface Props {
@@ -23,6 +23,7 @@ interface Box {
   w: number;
   h: number;
   cls: string;
+  ident?: string;
 }
 
 export default function SvgView({ value, selection, pulse, changed, hover, slotRefs, onSelectionComplete, onDragStart }: Props) {
@@ -44,11 +45,27 @@ export default function SvgView({ value, selection, pulse, changed, hover, slotR
         const el = svg.querySelector(`[id="${CSS.escape(ref.id)}"]`);
         if (!el) return;
         const r = el.getBoundingClientRect();
-        out.push({ key, x: r.left - crect.left - 3, y: r.top - crect.top - 3, w: r.width + 6, h: r.height + 6, cls });
+        out.push({
+          key,
+          x: r.left - crect.left - 3,
+          y: r.top - crect.top - 3,
+          w: r.width + 6,
+          h: r.height + 6,
+          cls,
+          ident: cls === 'sel' ? refIdent(ref) : undefined,
+        });
       } else if (ref.type === 'location') {
         const p = svgToClient(svg, ref.x, ref.y);
         if (!p) return;
-        out.push({ key, x: p.x - crect.left - 5, y: p.y - crect.top - 5, w: 10, h: 10, cls: cls + ' loc' });
+        out.push({
+          key,
+          x: p.x - crect.left - 5,
+          y: p.y - crect.top - 5,
+          w: 10,
+          h: 10,
+          cls: cls + ' loc',
+          ident: cls === 'sel' ? refIdent(ref) : undefined,
+        });
       }
     };
     selection.forEach((s, i) => add(s, 'sel', `sel-${i}`));
@@ -117,7 +134,9 @@ export default function SvgView({ value, selection, pulse, changed, hover, slotR
       <div className="svg-host" ref={host} dangerouslySetInnerHTML={{ __html: value }} />
       <div className="svg-overlay">
         {boxes.map((b) => (
-          <div key={b.key} className={`box ${b.cls}`} style={{ left: b.x, top: b.y, width: b.w, height: b.h }} />
+          <div key={b.key} className={`box ${b.cls}`} style={{ left: b.x, top: b.y, width: b.w, height: b.h }}>
+            {b.ident && <span className="box-id">{b.ident}</span>}
+          </div>
         ))}
       </div>
     </div>

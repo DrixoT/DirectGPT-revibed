@@ -577,7 +577,7 @@ export default function App() {
                 generating={!!pending}
                 status={status}
                 error={error}
-                selectionCount={selection.length}
+                selection={selection}
                 onSubmit={(parts) => void execute(parts, selection, 'prompt')}
                 onStop={() => pendingRef.current?.abort.abort()}
                 onClearSelection={() => setSelection([])}

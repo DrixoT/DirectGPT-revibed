@@ -3,7 +3,7 @@ import type React from 'react';
 import { chipInnerHTML, createChipElement, refFromChip } from '../chip';
 import { IconSend, IconStop } from '../icons';
 import { refreshElementRef } from '../svg';
-import { refLabel } from '../types';
+import { refIdent, refLabel } from '../types';
 import type { Content, ObjectRef, PromptPart } from '../types';
 
 export interface PromptFieldHandle {
@@ -22,7 +22,7 @@ interface Props {
   generating: boolean;
   status: string | null;
   error: string | null;
-  selectionCount: number;
+  selection: ObjectRef[];
   onSubmit: (parts: PromptPart[]) => void;
   onStop: () => void;
   onClearSelection: () => void;
@@ -125,7 +125,7 @@ export function partsAreEmpty(parts: PromptPart[]): boolean {
 }
 
 const PromptField = forwardRef<PromptFieldHandle, Props>(function PromptField(
-  { generating, status, error, selectionCount, onSubmit, onStop, onClearSelection, onHoverRef },
+  { generating, status, error, selection, onSubmit, onStop, onClearSelection, onHoverRef },
   ref,
 ) {
   const wrapper = useRef<HTMLDivElement>(null);
@@ -466,14 +466,12 @@ const PromptField = forwardRef<PromptFieldHandle, Props>(function PromptField(
             here, so the row holds the localization badge and the send button. */}
         <div className="composer-controls">
           <div className="composer-left">
-            {selectionCount > 0 && (
+            {selection.length > 0 && (
               <div className="apply-chip">
                 <button type="button" onClick={onClearSelection} title="Clear selection (Esc)">
                   ✕
                 </button>
-                <span>
-                  | Apply to {selectionCount} selected element{selectionCount > 1 ? 's' : ''}
-                </span>
+                <span title={selection.map(refIdent).join(', ')}>{selection.map(refIdent).join(', ')}</span>
               </div>
             )}
           </div>
