@@ -59,8 +59,11 @@ export interface Range {
 }
 
 export interface Settings {
-  apiKey: string;
+  openaiApiKey: string;
+  anthropicApiKey: string;
+  googleApiKey: string;
   model: string;
+  favorites: string[];
 }
 
 export function sameRef(a: ObjectRef, b: ObjectRef): boolean {

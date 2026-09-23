@@ -1,30 +1,62 @@
-import { useState } from 'react';
-import { DEFAULT_MODEL } from '../settings';
+import { useEffect, useRef, useState } from 'react';
+import { providerOf, type Provider } from '../models';
 import type { Settings } from '../types';
 
 interface Props {
   settings: Settings;
   onSave: (s: Settings) => void;
   onClose: () => void;
+  focusProvider?: Provider;
 }
 
-export default function SettingsDialog({ settings, onSave, onClose }: Props) {
-  const [apiKey, setApiKey] = useState(settings.apiKey);
-  const [model, setModel] = useState(settings.model || DEFAULT_MODEL);
+export default function SettingsDialog({ settings, onSave, onClose, focusProvider }: Props) {
+  const [openaiApiKey, setOpenaiApiKey] = useState(settings.openaiApiKey);
+  const [anthropicApiKey, setAnthropicApiKey] = useState(settings.anthropicApiKey);
+  const [googleApiKey, setGoogleApiKey] = useState(settings.googleApiKey);
+  const openaiRef = useRef<HTMLInputElement>(null);
+  const anthropicRef = useRef<HTMLInputElement>(null);
+  const googleRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const p = focusProvider ?? providerOf(settings.model);
+    const el = p === 'anthropic' ? anthropicRef.current : p === 'google' ? googleRef.current : openaiRef.current;
+    el?.focus();
+  }, [focusProvider, settings.model]);
+
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <h2>Settings</h2>
         <label>
           OpenAI API key
-          <input type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="sk-..." autoFocus />
+          <input
+            ref={openaiRef}
+            type="password"
+            value={openaiApiKey}
+            onChange={(e) => setOpenaiApiKey(e.target.value)}
+            placeholder="sk-..."
+          />
         </label>
-        <p className="hint">The key is stored only in this browser (localStorage) and sent directly to api.openai.com.</p>
         <label>
-          Model
-          <input type="text" value={model} onChange={(e) => setModel(e.target.value)} placeholder={DEFAULT_MODEL} />
+          Anthropic API key
+          <input
+            ref={anthropicRef}
+            type="password"
+            value={anthropicApiKey}
+            onChange={(e) => setAnthropicApiKey(e.target.value)}
+            placeholder="sk-ant-..."
+          />
         </label>
-        <p className="hint">The paper uses “gpt-3.5-turbo”. Change it only if that model is no longer served for your account.</p>
+        <label>
+          Google API key
+          <input
+            ref={googleRef}
+            type="password"
+            value={googleApiKey}
+            onChange={(e) => setGoogleApiKey(e.target.value)}
+            placeholder="AIza..."
+          />
+        </label>
         <div className="modal-actions">
           <button type="button" onClick={onClose}>
             Cancel
@@ -33,7 +65,13 @@ export default function SettingsDialog({ settings, onSave, onClose }: Props) {
             type="button"
             className="primary"
             onClick={() => {
-              onSave({ apiKey: apiKey.trim(), model: model.trim() || DEFAULT_MODEL });
+              onSave({
+                openaiApiKey: openaiApiKey.trim(),
+                anthropicApiKey: anthropicApiKey.trim(),
+                googleApiKey: googleApiKey.trim(),
+                model: settings.model,
+                favorites: settings.favorites,
+              });
               onClose();
             }}
           >

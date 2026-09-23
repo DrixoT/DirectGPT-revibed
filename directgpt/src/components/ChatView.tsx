@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type React from 'react';
 import { useGlitchIn } from '../glitch';
 import { IconSend, IconStop } from '../icons';
+import { hasKeyFor } from '../models';
 import { streamChat } from '../openai';
 import type { ChatMessage } from '../openai';
 import Prism from '../prism';
@@ -82,7 +83,7 @@ export default function ChatView({ settings, onNeedKey, onError, seed }: Props) 
   const send = useCallback(async () => {
     const text = input.trim();
     if (!text || generating) return;
-    if (!settings.apiKey) {
+    if (!hasKeyFor(settings)) {
       onNeedKey();
       return;
     }

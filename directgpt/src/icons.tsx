@@ -89,3 +89,74 @@ export function IconStop({ className }: IconProps) {
     </svg>
   );
 }
+
+/** Not in the Figma source: model-picker chrome. */
+export function IconStar({ className, filled }: IconProps & { filled?: boolean }) {
+  return (
+    <svg className={className} width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <path
+        d="M7 1.6l1.54 3.12 3.45.5-2.5 2.43.59 3.44L7 9.47 3.92 11.09l.59-3.44-2.5-2.43 3.45-.5L7 1.6z"
+        fill={filled ? 'currentColor' : 'none'}
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function IconSearch({ className }: IconProps) {
+  return (
+    <svg className={className} width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <circle cx="6.2" cy="6.2" r="3.7" stroke="currentColor" strokeWidth="1.4" />
+      <path d="M9 9.2L12 12.2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function IconOpenAI({ className }: IconProps) {
+  return (
+    <svg className={className} width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+      <circle cx="9" cy="9" r="7.25" stroke="currentColor" strokeWidth="1.4" />
+      <path
+        d="M9 4.4c1.3 0 2.4.7 3 1.7-.6.2-1.3.3-2 .3-1.6 0-3-.8-3.7-2 .7-.6 1.6-1 2.7-1zm-3.4 2.2c.9-1 2.2-1.6 3.6-1.6.2 1.6 1.1 3 2.4 3.8-.5.9-1.3 1.6-2.3 2-1.2-1.4-2.8-2.4-3.7-4.2zm-.3 4c-.6-1-.7-2.2-.3-3.3 1.5.6 3.2.7 4.7.2.3 1.1.2 2.3-.3 3.3-1.3-.3-2.8-.3-4.1-.2zm3.7 3c-1.3 0-2.5-.6-3.3-1.6.9-.4 1.8-1.1 2.4-2 1.5.8 2.6 2.2 3 3.8-.7.5-1.4.8-2.1.8zm3.6-2.1c-.6 1.1-1.7 1.9-3 2.2-.3-1.6-1.2-3-2.5-3.8.5-.9 1.3-1.6 2.3-2 1.3 1.3 2.6 2.5 3.2 3.6z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+export function IconAnthropic({ className }: IconProps) {
+  return (
+    <svg className={className} width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+      <path d="M9 3.2L12.8 14.8h-2.1l-.7-2H8l-.7 2H5.2L9 3.2zM8.6 11.2h.8L9 10.1l-.4 1.1z" fill="currentColor" />
+    </svg>
+  );
+}
+
+export function IconGoogle({ className }: IconProps) {
+  return (
+    <svg className={className} width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+      <path
+        d="M15.7 9.2c0-.5-.04-.9-.12-1.3H9.2v2.5h3.64c-.16.8-.63 1.48-1.34 1.94v1.6h2.16c1.27-1.17 2.04-2.9 2.04-4.74z"
+        fill="currentColor"
+        opacity="0.95"
+      />
+      <path
+        d="M9.2 16c1.82 0 3.35-.6 4.47-1.64l-2.16-1.6c-.6.4-1.37.64-2.31.64-1.78 0-3.28-1.2-3.82-2.82H3.14v1.66C4.25 14.86 6.54 16 9.2 16z"
+        fill="currentColor"
+        opacity="0.8"
+      />
+      <path
+        d="M5.38 10.58A3.9 3.9 0 0 1 5.16 9c0-.55.08-1.08.22-1.58V5.76H3.14A6.8 6.8 0 0 0 2.4 9c0 1.1.26 2.14.74 3.08l2.24-1.5z"
+        fill="currentColor"
+        opacity="0.7"
+      />
+      <path
+        d="M9.2 5.16c.99 0 1.88.34 2.58 1.01l1.93-1.93C12.54 3.12 11.02 2.5 9.2 2.5 6.54 2.5 4.25 3.64 3.14 5.76l2.24 1.66c.54-1.62 2.04-2.26 3.82-2.26z"
+        fill="currentColor"
+        opacity="0.85"
+      />
+    </svg>
+  );
+}

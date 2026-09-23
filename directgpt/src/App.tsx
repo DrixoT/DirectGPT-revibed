@@ -14,6 +14,7 @@ import TopBar from './components/TopBar';
 import { extractLocalized, extractObject } from './extract';
 import { changedRanges } from './diff';
 import { streamChat } from './openai';
+import { hasKeyFor, providerOf, type Provider } from './models';
 import { buildPrompts, plainPromptText } from './prompts';
 import { SAMPLES } from './samples';
 import type { Sample } from './samples';
@@ -79,6 +80,7 @@ function isEditableTarget(t: EventTarget | null): boolean {
 export default function App() {
   const [settings, setSettings] = useState<Settings>(loadSettings);
   const [showSettings, setShowSettings] = useState(false);
+  const [settingsFocus, setSettingsFocus] = useState<Provider | undefined>();
   const [mode, setMode] = useState<'direct' | 'chat'>('direct');
   const history = useHistory<Content | null>(null);
   const content = history.current;
@@ -262,7 +264,8 @@ export default function App() {
       setError('A prompt is already running. Stop it first.');
       return;
     }
-    if (!settings.apiKey) {
+    if (!hasKeyFor(settings)) {
+      setSettingsFocus(providerOf(settings.model));
       setShowSettings(true);
       return;
     }
@@ -480,7 +483,7 @@ export default function App() {
     <div className="app">
       <Sidebar
         mode={mode}
-        hasKey={!!settings.apiKey}
+        hasKey={hasKeyFor(settings)}
         activeSample={activeSample}
         studyRunning={!!study}
         canNew={mode === 'direct' && !study}
@@ -496,7 +499,10 @@ export default function App() {
           startTask(a, 0);
         }}
         onQuitStudy={quitStudy}
-        onOpenSettings={() => setShowSettings(true)}
+        onOpenSettings={() => {
+          setSettingsFocus(providerOf(settings.model));
+          setShowSettings(true);
+        }}
         onClickTool={handleToolClick}
         onRemoveTool={(id) => setTools((ts) => ts.filter((t) => t.id !== id))}
         onHoverRef={setHoverRef}
@@ -504,11 +510,27 @@ export default function App() {
 
       <div className="app-main">
         <TopBar
-          model={settings.model}
+          settings={settings}
           mode={mode}
-          hasKey={!!settings.apiKey}
+          hasKey={hasKeyFor(settings)}
           onSetMode={setMode}
-          onOpenSettings={() => setShowSettings(true)}
+          onSelectModel={(id) => {
+            const next = { ...settings, model: id };
+            setSettings(next);
+            saveSettings(next);
+            if (!hasKeyFor(next)) {
+              setSettingsFocus(providerOf(id));
+              setShowSettings(true);
+            }
+          }}
+          onToggleFavorite={(id) => {
+            const favorites = settings.favorites.includes(id)
+              ? settings.favorites.filter((f) => f !== id)
+              : [...settings.favorites, id];
+            const next = { ...settings, favorites };
+            setSettings(next);
+            saveSettings(next);
+          }}
         />
 
         {mode === 'direct' ? (
@@ -601,7 +623,15 @@ export default function App() {
                 onQuit={quitStudy}
               />
             )}
-            <ChatView settings={settings} onNeedKey={() => setShowSettings(true)} onError={setError} seed={chatSeed} />
+            <ChatView
+              settings={settings}
+              onNeedKey={() => {
+                setSettingsFocus(providerOf(settings.model));
+                setShowSettings(true);
+              }}
+              onError={setError}
+              seed={chatSeed}
+            />
           </div>
         )}
       </div>
@@ -627,11 +657,15 @@ export default function App() {
       {showSettings && (
         <SettingsDialog
           settings={settings}
+          focusProvider={settingsFocus}
           onSave={(s) => {
             setSettings(s);
             saveSettings(s);
           }}
-          onClose={() => setShowSettings(false)}
+          onClose={() => {
+            setShowSettings(false);
+            setSettingsFocus(undefined);
+          }}
         />
       )}
       {error && (
